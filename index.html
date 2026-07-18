@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GANG CORRE PARTY — 29/08 · Umuarama</title>
+<meta name="description" content="O aniversário de 1 ano da Running Gang: corre de 5K grátis pelas ruas de Umuarama + festa com 3 atrações no Espaço Seu Jorge. 29/08, a partir das 20h.">
+<meta property="og:title" content="GANG CORRE PARTY — 29/08 · Umuarama">
+<meta property="og:description" content="Corre de 5K grátis + festa com 3 atrações. O maior evento wellness do ano em Umuarama. Garanta seu ingresso.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111009;--bg-2:#161510;--surface:#1C1A15;--surface-2:#232019;
+  --line:#2E2B23;--line-soft:#25221B;--text:#F4F2EA;--muted:#A8A294;
+  --accent:#F2B127;--accent-dim:rgba(242,177,39,.12);--radius:1.5rem;
+  --display:Haettenschweiler,"Arial Narrow Bold",Impact,"Franklin Gothic Medium",sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","Segoe UI Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--accent);color:#111009}
+.container{max-width:1080px;margin:0 auto;padding:0 24px}
+.narrow{max-width:840px}
+img{max-width:100%}
+
+.grain{position:fixed;inset:-100px;z-index:50;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-40px,30px)}50%{transform:translate(30px,-45px)}75%{transform:translate(-25px,-20px)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){.grain{animation:none}}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;background:rgba(17,16,9,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(46,43,35,.6)}
+.nav .rg{display:block;width:42px;height:auto;opacity:.9}
+.nav .btn{opacity:0;pointer-events:none;transform:translateY(-8px);
+  transition:opacity .4s cubic-bezier(.23,1,.32,1),transform .4s cubic-bezier(.23,1,.32,1),color .35s}
+.nav.scrolled .btn{opacity:1;pointer-events:auto;transform:none}
+
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.015em;line-height:.98;text-wrap:balance}
+h2{font-size:clamp(2.4rem,6vw,4rem);text-transform:uppercase;margin-bottom:20px}
+p{max-width:64ch}
+.lead{font-size:1.15rem}
+.sub{color:var(--muted)}
+
+.rv{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.8rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer;
+  background:var(--accent);color:#111009;border:1px solid var(--accent);border-radius:999px;padding:15px 30px;
+  position:relative;overflow:hidden;isolation:isolate;transition:color .35s cubic-bezier(.23,1,.32,1)}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;background:#111009;
+  clip-path:ellipse(80% 50% at 50% 152%);transition:clip-path .5s cubic-bezier(.86,0,.07,1)}
+.btn:hover{color:var(--accent)}
+.btn:hover::before{clip-path:ellipse(120% 90% at 50% 50%)}
+.btn:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn.ghost::before{background:var(--accent)}
+.btn.ghost:hover{color:#111009;border-color:var(--accent)}
+.btn.sm{padding:10px 20px;font-size:.72rem}
+
+/* hero */
+.hero{position:relative;margin:1rem;border-radius:var(--radius);overflow:hidden;background:var(--bg-2);
+  display:flex;flex-direction:column;align-items:center;text-align:center;padding:118px 20px 0}
+@media (max-width:640px){.hero{padding-top:100px;margin:.6rem}}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero .inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+.hero .logo{display:block;width:min(170px,40vw);height:auto;margin-bottom:26px;filter:drop-shadow(0 20px 50px rgba(0,0,0,.6))}
+.hero h1{font-size:clamp(2.4rem,6.6vw,4.6rem);text-transform:uppercase;margin:0 auto 16px;max-width:16ch}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .tag{font-size:1.13rem;color:var(--muted);max-width:46ch;margin:0 auto}
+.info{display:flex;flex-wrap:wrap;justify-content:center;column-gap:20px;row-gap:7px;margin-top:26px;max-width:560px;
+  font-family:var(--mono);font-size:.76rem;letter-spacing:.05em;color:var(--muted)}
+.info span{white-space:nowrap}
+.info strong{color:var(--text);font-weight:600}
+@media (max-width:640px){.info{flex-direction:column;align-items:center;row-gap:8px;font-size:.74rem}}
+.count{margin-top:14px;font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);font-variant-numeric:tabular-nums}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px}
+@media (max-width:640px){.cta-row{flex-direction:column;width:100%;max-width:340px}.cta-row .btn{width:100%;justify-content:center}}
+.reel{position:relative;z-index:2;width:calc(100% + 40px);margin:52px -20px 0;aspect-ratio:16/9;background:#0B0A07}
+.reel video{display:block;width:100%;height:100%;object-fit:cover}
+.reel-ui{position:absolute;right:14px;bottom:14px;z-index:3;display:flex;gap:8px}
+.vbtn{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-family:var(--mono);font-size:.72rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text);background:rgba(17,16,9,.62);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(244,242,234,.18);
+  border-radius:999px;padding:9px 15px;transition:border-color .3s,transform .3s}
+.vbtn:hover{border-color:var(--accent);transform:translateY(-2px)}
+@media (max-width:640px){.reel-ui{right:10px;bottom:10px}.vbtn{padding:8px 12px;font-size:.68rem}}
+
+section{padding:104px 0}
+@media (max-width:640px){section{padding:76px 0}}
+section[id]{scroll-margin-top:72px}
+
+/* momentos */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:44px}
+@media (max-width:680px){.duo{grid-template-columns:1fr}}
+.moment{border-radius:var(--radius);padding:36px 32px;border:1px solid var(--line);background:var(--surface);
+  transition:transform .4s cubic-bezier(.23,1,.32,1),border-color .4s}
+.moment:hover{transform:translateY(-4px);border-color:var(--accent)}
+.moment .k{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;margin-bottom:14px;color:var(--accent)}
+.moment h3{font-size:2.2rem;text-transform:uppercase;margin-bottom:10px}
+.moment p{font-size:.97rem;color:var(--muted)}
+.moment .badge{display:inline-block;margin-top:22px;font-family:var(--mono);font-size:.74rem;letter-spacing:.05em;
+  text-transform:uppercase;border-radius:8px;padding:8px 14px;background:var(--accent-dim);color:var(--accent)}
+
+/* roteiro */
+.timeline{margin-top:44px}
+.step{display:grid;grid-template-columns:100px 1fr;gap:24px;padding:26px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:none}
+.step .hora{font-family:var(--display);font-size:1.8rem;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.2}
+.step.hot .hora{color:var(--accent)}
+.step h3{font-size:1.5rem;text-transform:uppercase;margin-bottom:5px}
+.step p{font-size:.96rem;color:var(--muted)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:1rem;padding:26px 22px;
+  transition:transform .4s,border-color .4s}
+.stat:hover{transform:translateY(-4px);border-color:var(--accent)}
+.stat .n{font-family:var(--display);font-size:2.9rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.stat .l{font-size:.85rem;color:var(--muted);margin-top:10px;line-height:1.45}
+
+/* escassez */
+.scarcity{display:inline-flex;align-items:center;gap:10px;margin-top:18px;font-family:var(--mono);font-size:.74rem;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(242,177,39,.35);
+  border-radius:999px;padding:9px 18px;background:var(--accent-dim)}
+.scarcity .dot{width:8px;height:8px;border-radius:99px;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){.scarcity .dot{animation:none}}
+
+/* tabs de eventos */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:40px}
+.tab{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:11px 20px;transition:color .3s,border-color .3s,background .3s}
+.tab:hover{color:var(--text);border-color:var(--accent)}
+.tab.on{color:#111009;background:var(--accent);border-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.panel{display:none;margin-top:30px}
+.panel.on{display:block}
+.panel .desc{color:var(--muted);max-width:60ch;margin-bottom:24px}
+.panel .desc strong{color:var(--text)}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:700px){.gal{grid-template-columns:repeat(2,1fr)}}
+.gal img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--surface);
+  transition:transform .4s cubic-bezier(.23,1,.32,1)}
+.gal img:hover{transform:scale(1.03)}
+
+/* faq */
+.faq{margin-top:44px;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;padding:24px 48px 24px 0;font-weight:600;font-size:1.05rem;list-style:none;position:relative;transition:color .3s}
+.faq summary:hover{color:var(--accent)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  font-family:var(--display);font-size:1.7rem;color:var(--accent)}
+.faq details[open] summary::after{content:"–"}
+.faq .a{padding:0 8px 26px 0;color:var(--muted);font-size:.97rem;max-width:64ch}
+
+/* final */
+.final{position:relative;margin:0 1rem 1rem;border-radius:var(--radius);overflow:hidden;background:var(--bg-2);
+  min-height:80svh;display:flex;align-items:flex-end}
+.final canvas{position:absolute;inset:0;width:100%;height:100%}
+.final .inner{position:relative;z-index:2;width:100%;max-width:1080px;margin:0 auto;padding:90px 40px 68px}
+@media (max-width:640px){.final .inner{padding:70px 24px 46px}}
+.final h2{font-size:clamp(3rem,9vw,6rem);margin-bottom:16px}
+.final .logos{display:flex;align-items:center;gap:26px;margin-top:44px}
+.final .logos img{height:60px;width:auto;opacity:.9}
+.final .logos img.rg{height:52px}
+.final .rule{height:5px;border-radius:3px;margin-top:36px;max-width:480px;background:linear-gradient(90deg,var(--accent),transparent)}
+
+/* modal patrocínio */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.on{display:flex}
+.modal .back{position:absolute;inset:0;background:rgba(10,9,6,.8);backdrop-filter:blur(6px)}
+.modal .box{position:relative;z-index:2;width:min(440px,100%);background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radius);padding:36px 30px}
+.modal h3{font-size:1.9rem;text-transform:uppercase;margin-bottom:6px}
+.modal .sub{font-size:.92rem;margin-bottom:22px}
+.modal label{display:block;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.modal input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  color:var(--text);font-size:1rem;padding:13px 15px;transition:border-color .3s}
+.modal input:focus{outline:none;border-color:var(--accent)}
+.modal .btn{width:100%;justify-content:center;margin-top:22px}
+.modal .x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);
+  font-size:1.5rem;cursor:pointer;line-height:1;padding:6px}
+.modal .x:hover{color:var(--text)}
+.modal .ok{display:none;text-align:center;padding:10px 0}
+.modal .ok .big{font-family:var(--display);font-size:2rem;text-transform:uppercase;margin-bottom:8px}
+.modal.done form{display:none}
+.modal.done .ok{display:block}
+.modal .err{display:none;color:#E8622C;font-size:.85rem;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav">
+  <img class="rg" src="assets/logo-rg-white.png" alt="Running Gang">
+  <a class="btn sm" href="#ingresso" data-checkout>Garantir ingresso</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <canvas id="fx-hero" aria-hidden="true"></canvas>
+  <div class="inner">
+    <img class="logo" alt="Gang Corre Party" src="assets/logo-gcp-white.png">
+    <h1>O corre é <em>grátis.</em><br>A festa é histórica.</h1>
+    <p class="tag">O aniversário de 1 ano da Running Gang: 5K aberto à cidade inteira que termina numa festa com 3 atrações no palco. Uma noite só.</p>
+    <div class="info">
+      <span><strong>29/08</strong> · sábado</span>
+      <span><strong>Espaço Seu Jorge</strong> · Umuarama-PR</span>
+      <span><strong>20h</strong> largada · <strong>21h</strong> festa</span>
+      <span><strong>5K grátis</strong> + festa com ingresso</span>
+    </div>
+    <div class="count" id="countdown" aria-live="off"></div>
+    <div class="cta-row">
+      <a class="btn" href="#ingresso" data-checkout id="cta-ingresso">🎟 Garantir meu ingresso</a>
+      <button class="btn ghost" type="button" data-patrocinio>Quero patrocinar o evento</button>
+    </div>
+  </div>
+  <figure class="reel">
+    <video id="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
+      <source src="assets/hero.mp4" type="video/mp4">
+    </video>
+    <div class="reel-ui">
+      <button class="vbtn" id="btn-som" type="button" aria-label="Ativar som do vídeo">🔇 Ativar som</button>
+    </div>
+  </figure>
+</header>
+
+<!-- O EVENTO -->
+<section id="evento">
+  <div class="container narrow">
+    <div class="rv">
+      <div class="eyebrow">01 · O evento</div>
+      <h2>Um evento, dois momentos</h2>
+      <p class="lead">Você corre 5 km com a cidade inteira, de graça, com música acompanhando o pelotão — e cruza a linha de chegada na porta de uma festa com 3 atrações. Quem tem ingresso entra direto.</p>
+    </div>
+    <div class="duo rv">
+      <div class="moment">
+        <div class="k">Momento 1 · O corre</div>
+        <h3>5K com trilha sonora</h3>
+        <p>Percurso de 5 km pelas ruas de Umuarama, aberto a qualquer pessoa — caixas de som móveis no meio do pelotão. Nunca correu 5K? 75% da Gang fez o primeiro com a gente.</p>
+        <span class="badge">Livre e gratuito · leve quem você quiser</span>
+      </div>
+      <div class="moment">
+        <div class="k">Momento 2 · O rolê</div>
+        <h3>Festa com 3 atrações</h3>
+        <p>A linha de chegada é a entrada da festa. À noite, 3 atrações no palco, ativações de marcas parceiras e bar até o fim. Só entra quem tem ingresso.</p>
+        <span class="badge">Capacidade limitada do espaço</span>
+      </div>
+    </div>
+    <div class="timeline rv">
+      <div class="step"><div class="hora">19h+</div><div><h3>Concentração</h3><p>Aquecimento, fotos e energia de festival no ponto de largada.</p></div></div>
+      <div class="step"><div class="hora">20h</div><div><h3>Largada dos 5K</h3><p>Percurso urbano com som móvel, desenhado pra terminar no Espaço Seu Jorge.</p></div></div>
+      <div class="step"><div class="hora">21h</div><div><h3>Chegada = festa</h3><p>Quem tem ingresso entra direto, sem fila, suado e feliz.</p></div></div>
+      <div class="step hot"><div class="hora">Noite</div><div><h3>O rolê</h3><p>3 atrações no palco e bar a todo vapor até o encerramento.</p></div></div>
+    </div>
+    <div class="cta-row rv" style="justify-content:flex-start">
+      <a class="btn" href="#ingresso" data-checkout>🎟 Garantir meu ingresso</a>
+    </div>
+  </div>
+</section>
+
+<!-- NÚMEROS -->
+<section style="padding-top:0">
+  <div class="container narrow">
+    <div class="rv">
+      <div class="eyebrow">02 · A comunidade</div>
+      <h2>Você não vai sozinho — vai com a Gang</h2>
+      <p class="lead">Em menos de 1 ano, a Running Gang virou o maior movimento de wellness da região. Todo evento lota — e esse é o aniversário.</p>
+    </div>
+    <div class="stats rv">
+      <div class="stat"><div class="n">750+</div><div class="l">pessoas no nosso maior evento — a estimativa era 200</div></div>
+      <div class="stat"><div class="n">1M+</div><div class="l">impressões orgânicas em 5 meses</div></div>
+      <div class="stat"><div class="n">12</div><div class="l">estados brasileiros já representados</div></div>
+      <div class="stat"><div class="n">75%</div><div class="l">fizeram o primeiro 5K da vida num evento da Gang</div></div>
+      <div class="stat"><div class="n">20+</div><div class="l">marcas parceiras dentro das experiências</div></div>
+      <div class="stat"><div class="n">1 ano</div><div class="l">de comunidade — e essa é a festa de aniversário</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTOS ANTERIORES -->
+<section id="historia" style="padding-top:0">
+  <div class="container narrow">
+    <div class="rv">
+      <div class="eyebrow">03 · Quem foi, sabe</div>
+      <h2>Os eventos que lotaram antes desse</h2>
+      <p class="lead">Não é promessa — é histórico. Escolhe um evento e vê como foi.</p>
+    </div>
+    <div class="tabs rv" role="tablist" id="tabs"></div>
+    <div id="panels"></div>
+    <div class="cta-row rv" style="justify-content:flex-start;margin-top:36px">
+      <a class="btn" href="#ingresso" data-checkout>🎟 Quero estar no próximo</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding-top:0">
+  <div class="container narrow">
+    <div class="rv">
+      <div class="eyebrow">04 · Perguntas frequentes</div>
+      <h2>Antes de você perguntar</h2>
+    </div>
+    <div class="faq rv">
+      <details><summary>O corre é grátis mesmo?</summary><div class="a">Sim. O 5K é livre e gratuito, aberto a qualquer pessoa — só chegar no ponto de largada às 19h. O ingresso vale pra festa no Espaço Seu Jorge depois do corre.</div></details>
+      <details><summary>Preciso correr pra ir na festa?</summary><div class="a">Não. Dá pra ir só na festa — mas cruzar a chegada com o pelotão e entrar direto no rolê é outra experiência.</div></details>
+      <details><summary>Nunca corri 5K. Consigo?</summary><div class="a">75% da comunidade fez o primeiro 5K num evento da Gang. O pelotão tem todos os ritmos — andar também vale. Ninguém fica pra trás.</div></details>
+      <details><summary>Quais são as atrações?</summary><div class="a">3 atrações no palco durante a noite. Line-up divulgado nas redes da Gang (@runninggang_br) — quanto antes garantir o ingresso, melhor o lote.</div></details>
+      <details><summary>Até que horas vai?</summary><div class="a">Festa começa às 21h, logo depois da chegada do corre, e vai até o encerramento com bar operando o tempo todo.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL -->
+<footer class="final" id="ingresso">
+  <canvas id="fx-final" aria-hidden="true"></canvas>
+  <div class="inner">
+    <div class="eyebrow">A festa de 1 ano é uma só</div>
+    <h2>Garanta seu lugar<br>na história da Gang</h2>
+    <p class="sub" style="max-width:46ch">29/08 (sábado) · Espaço Seu Jorge, Umuarama-PR. Capacidade limitada do espaço — quando esgotar, esgotou.</p>
+    <div class="scarcity"><span class="dot"></span>Lotes progressivos — o preço só sobe</div>
+    <div class="cta-row" style="justify-content:flex-start">
+      <a class="btn" href="#" data-checkout>🎟 Comprar ingresso agora</a>
+      <button class="btn ghost" type="button" data-patrocinio>Quero patrocinar o evento</button>
+    </div>
+    <div class="logos">
+      <img src="assets/logo-gcp-white.png" alt="Gang Corre Party">
+      <img class="rg" src="assets/logo-rg-white.png" alt="Running Gang">
+    </div>
+    <div class="rule"></div>
+  </div>
+</footer>
+
+<!-- MODAL PATROCÍNIO -->
+<div class="modal" id="modal-pat" role="dialog" aria-modal="true" aria-label="Quero patrocinar">
+  <div class="back" data-close></div>
+  <div class="box">
+    <button class="x" type="button" data-close aria-label="Fechar">×</button>
+    <h3>Patrocine o evento</h3>
+    <p class="sub">Preencha e receba na hora o deck completo com formatos e contrapartidas.</p>
+    <form id="form-pat">
+      <label for="f-nome">Seu nome</label>
+      <input id="f-nome" name="nome" required maxlength="120" autocomplete="name">
+      <label for="f-tel">Telefone / WhatsApp</label>
+      <input id="f-tel" name="telefone" required maxlength="40" inputmode="tel" autocomplete="tel">
+      <label for="f-emp">Empresa</label>
+      <input id="f-emp" name="empresa" required maxlength="120" autocomplete="organization">
+      <button class="btn" type="submit" id="f-send">Enviar e acessar o deck</button>
+      <div class="err" id="f-err">Não foi possível enviar. Tenta de novo.</div>
+    </form>
+    <div class="ok">
+      <div class="big">Tamo junto! 🤝</div>
+      <p class="sub">Seus dados foram enviados. O deck completo de patrocínio tá liberado:</p>
+      <a class="btn" href="https://deck-comercial-gcp.vercel.app" target="_blank" rel="noopener">Abrir o deck de patrocínio</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* eventos anteriores */
+var EVENTOS = [
+  {slug:"ultra-coffee-party", nome:"Ultra Coffee Party", n:27,
+   desc:"Treino, café e festa no mesmo rolê — o evento que mostrou que a Gang não faz \"corridinha\", faz experiência. <strong>O ensaio geral do que o Gang Corre Party vai ser.</strong>"},
+  {slug:"running-music-2", nome:"Running Music 2", n:28,
+   desc:"A segunda edição do formato que colocou a Gang no mapa: corre pelas ruas com música ao vivo acompanhando o pelotão. <strong>Maior, mais cheio e mais barulhento que o primeiro.</strong>"},
+  {slug:"running-music-1", nome:"Running Music 1", n:10,
+   desc:"Onde tudo começou a escalar: o primeiro corre com trilha sonora ao vivo de Umuarama. <strong>Quem foi, entendeu na hora por que a Gang cresceu tão rápido.</strong>"},
+  {slug:"yoga-coffee-sync", nome:"Yoga Coffee Sync", n:23,
+   desc:"O lado wellness da Gang: yoga em rooftop + café da manhã com a comunidade. <strong>Prova de que a Gang vai muito além da corrida.</strong>"},
+  {slug:"treinos-corvo", nome:"Treinos ft. Corvo", n:12,
+   desc:"Os treinos que acontecem toda semana — o coração da comunidade batendo fora dos grandes eventos. <strong>É aqui que a Gang vira família.</strong>"}
+];
+var tabs = document.getElementById("tabs"), panels = document.getElementById("panels");
+EVENTOS.forEach(function(ev, i){
+  var b = document.createElement("button");
+  b.className = "tab" + (i===0?" on":"");
+  b.type = "button"; b.role = "tab"; b.textContent = ev.nome;
+  b.addEventListener("click", function(){
+    tabs.querySelectorAll(".tab").forEach(function(t){t.classList.remove("on")});
+    panels.querySelectorAll(".panel").forEach(function(p){p.classList.remove("on")});
+    b.classList.add("on");
+    document.getElementById("p-"+ev.slug).classList.add("on");
+  });
+  tabs.appendChild(b);
+  var p = document.createElement("div");
+  p.className = "panel" + (i===0?" on":"");
+  p.id = "p-"+ev.slug;
+  var imgs = "";
+  for(var k=1;k<=ev.n;k++){
+    var nn = (k<10?"0":"")+k;
+    imgs += '<img src="assets/eventos/'+ev.slug+'/'+nn+'.jpg" alt="'+ev.nome+' — foto '+k+'" loading="lazy" decoding="async">';
+  }
+  p.innerHTML = '<p class="desc">'+ev.desc+'</p><div class="gal">'+imgs+'</div>';
+  panels.appendChild(p);
+});
+
+/* reveal */
+var io = new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+},{threshold:.12});
+document.querySelectorAll(".rv").forEach(function(el){ io.observe(el); });
+
+/* nav CTA pós-hero */
+var nav = document.querySelector(".nav"), heroCta = document.querySelector(".hero .cta-row");
+if(nav && heroCta){
+  new IntersectionObserver(function(es){ nav.classList.toggle("scrolled", !es[0].isIntersecting); },{threshold:0}).observe(heroCta);
+}
+
+/* som do vídeo */
+var hv = document.getElementById("hero-video"), sbtn = document.getElementById("btn-som");
+if(hv){
+  var tryPlay = function(){ var p = hv.play(); if(p && p.catch) p.catch(function(){}); };
+  tryPlay();
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) tryPlay(); });
+  addEventListener("touchstart", tryPlay, {once:true, passive:true});
+  addEventListener("click", tryPlay, {once:true});
+  addEventListener("scroll", tryPlay, {once:true, passive:true});
+}
+if(hv && sbtn){
+  sbtn.addEventListener("click", function(){
+    hv.muted = !hv.muted;
+    if(!hv.muted){ hv.volume = 1; var p = hv.play(); if(p && p.catch) p.catch(function(){}); }
+    sbtn.textContent = hv.muted ? "🔇 Ativar som" : "🔊 Som ligado";
+  });
+}
+
+/* countdown */
+var cd = document.getElementById("countdown");
+if(cd){
+  var alvo = new Date("2026-08-29T20:00:00-03:00").getTime();
+  function p2(n){ return (n<10?"0":"")+n; }
+  function tick(){
+    var d = alvo - Date.now();
+    if(d <= 0){ cd.textContent = "É hoje. Bora."; return; }
+    cd.textContent = "Faltam " + Math.floor(d/864e5) + "d " + p2(Math.floor(d%864e5/36e5)) + "h " + p2(Math.floor(d%36e5/6e4)) + "m " + p2(Math.floor(d%6e4/1e3)) + "s";
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+/* checkout placeholder — TODO: trocar href="#" pelo link do checkout quando existir */
+document.querySelectorAll("[data-checkout]").forEach(function(a){
+  if(a.getAttribute("href") === "#"){
+    a.addEventListener("click", function(e){ e.preventDefault(); });
+  }
+});
+
+/* modal patrocínio + lead pro Supabase */
+var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
+var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
+var modal = document.getElementById("modal-pat");
+document.querySelectorAll("[data-patrocinio]").forEach(function(b){
+  b.addEventListener("click", function(){ modal.classList.add("on"); document.getElementById("f-nome").focus(); });
+});
+modal.querySelectorAll("[data-close]").forEach(function(b){
+  b.addEventListener("click", function(){ modal.classList.remove("on"); });
+});
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") modal.classList.remove("on"); });
+document.getElementById("form-pat").addEventListener("submit", function(e){
+  e.preventDefault();
+  var send = document.getElementById("f-send"), err = document.getElementById("f-err");
+  err.style.display = "none"; send.disabled = true; send.textContent = "Enviando…";
+  fetch(SB_URL + "/rest/v1/rpc/add_lead", {
+    method:"POST",
+    headers:{ "apikey":SB_KEY, "Authorization":"Bearer " + SB_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({
+      p_nome: document.getElementById("f-nome").value,
+      p_telefone: document.getElementById("f-tel").value,
+      p_empresa: document.getElementById("f-emp").value
+    })
+  }).then(function(r){
+    if(!r.ok) throw 0;
+    modal.classList.add("done");
+  }).catch(function(){
+    err.style.display = "block";
+  }).finally(function(){
+    send.disabled = false; send.textContent = "Enviar e acessar o deck";
+  });
+});
+
+/* fundo fluido */
+function fluid(id){
+  var cv = document.getElementById(id); if(!cv) return;
+  var ctx = cv.getContext("2d"), W,H,blobs=[],m={x:.5,y:.5,tx:.5,ty:.5};
+  function rs(){ var r = cv.parentElement.getBoundingClientRect(); W=cv.width=Math.max(1,r.width); H=cv.height=Math.max(1,r.height); }
+  rs(); addEventListener("resize", rs);
+  for(var i=0;i<7;i++) blobs.push({x:Math.random(),y:Math.random(),r:.22+Math.random()*.28,dx:(Math.random()-.5)*.00045,dy:(Math.random()-.5)*.00045,ph:Math.random()*Math.PI*2});
+  cv.parentElement.addEventListener("pointermove", function(ev){ var r=cv.getBoundingClientRect(); m.tx=(ev.clientX-r.left)/r.width; m.ty=(ev.clientY-r.top)/r.height; });
+  var t=0;
+  (function fr(){
+    t+=.008; m.x+=(m.tx-m.x)*.04; m.y+=(m.ty-m.y)*.04;
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<blobs.length;i++){
+      var b=blobs[i]; b.x+=b.dx; b.y+=b.dy;
+      if(b.x<-.3||b.x>1.3)b.dx*=-1; if(b.y<-.3||b.y>1.3)b.dy*=-1;
+      var px=(b.x+(m.x-.5)*.05*(i%3))*W, py=(b.y+Math.sin(t+b.ph)*.03+(m.y-.5)*.05*(i%3))*H, rad=b.r*Math.min(W,H);
+      var g=ctx.createRadialGradient(px,py,0,px,py,rad);
+      g.addColorStop(0,"rgba(8,7,4,.85)"); g.addColorStop(1,"rgba(8,7,4,0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(px,py,rad,0,Math.PI*2); ctx.fill();
+    }
+    var gl=ctx.createRadialGradient(m.x*W,m.y*H,0,m.x*W,m.y*H,Math.min(W,H)*.5);
+    gl.addColorStop(0,"rgba(242,177,39,.07)"); gl.addColorStop(1,"rgba(242,177,39,0)");
+    ctx.fillStyle=gl; ctx.fillRect(0,0,W,H);
+    if(!reduced) requestAnimationFrame(fr);
+  })();
+}
+fluid("fx-hero"); fluid("fx-final");
+})();
+</script>
+</body>
+</html>
