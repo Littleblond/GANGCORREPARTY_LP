@@ -72,7 +72,22 @@ p{max-width:64ch}
 .hero .inner{padding:54px 0 76px}
 .hero canvas{position:absolute;inset:0;width:100%;height:100%}
 .hero .inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
-.hero .logo{display:block;width:min(170px,40vw);height:auto;margin-bottom:26px;filter:drop-shadow(0 20px 50px rgba(0,0,0,.6))}
+/* logo animada — transição líquida GCP <-> Running Gang */
+.logo-swap{position:relative;width:min(118px,30vw);aspect-ratio:1;margin-bottom:22px}
+.logo-swap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 16px 40px rgba(0,0,0,.6));will-change:opacity,transform,filter;
+  animation:liq 12s ease-in-out infinite}
+.logo-swap img:last-child{animation-delay:-6s}
+@keyframes liq{
+  0%,42%{opacity:1;transform:scale(1);filter:blur(0) drop-shadow(0 16px 40px rgba(0,0,0,.6))}
+  50%{opacity:0;transform:scale(.86);filter:blur(14px) drop-shadow(0 16px 40px rgba(0,0,0,.6))}
+  92%{opacity:0;transform:scale(1.1);filter:blur(14px) drop-shadow(0 16px 40px rgba(0,0,0,.6))}
+  100%{opacity:1;transform:scale(1);filter:blur(0) drop-shadow(0 16px 40px rgba(0,0,0,.6))}
+}
+@media (prefers-reduced-motion:reduce){
+  .logo-swap img{animation:none}
+  .logo-swap img:last-child{opacity:0}
+}
 .hero h1{font-size:clamp(2.4rem,6.6vw,4.6rem);text-transform:uppercase;margin:0 auto 16px;max-width:16ch}
 .hero h1 em{font-style:normal;color:var(--accent)}
 .hero .tag{font-size:1.13rem;color:var(--muted);max-width:46ch;margin:0 auto}
@@ -250,9 +265,12 @@ section[id]{scroll-margin-top:72px}
     </div>
   </figure>
   <div class="inner">
-    <img class="logo" alt="Gang Corre Party" src="assets/logo-gcp-white.png">
+    <div class="logo-swap" aria-label="Gang Corre Party · Running Gang">
+      <img src="assets/logo-gcp-white.png" alt="Gang Corre Party">
+      <img src="assets/logo-rg-white.png" alt="Running Gang">
+    </div>
     <h1>A festa de <em>1 ano</em> da Running Gang</h1>
-    <p class="tag">Não existe momento melhor: a experiência mais divertida e diferente que você vai viver esse ano com a Gang. Um corre de 5K grátis pela cidade inteira que termina numa festa com 3 atrações no palco.</p>
+    <p class="tag">Não existe momento melhor: a experiência mais divertida e diferente que você vai viver esse ano com a Gang. Um corre de 5K grátis — como um treino da Gang, só que com música e galera com som no meio do pelotão — que termina numa festa com 3 atrações no palco.</p>
     <div class="info">
       <span><strong>29/08</strong> · sábado</span>
       <span><strong>Espaço Seu Jorge</strong> · Umuarama-PR</span>
@@ -273,13 +291,13 @@ section[id]{scroll-margin-top:72px}
     <div class="rv">
       <div class="eyebrow">01 · O evento</div>
       <h2>Um evento, dois momentos</h2>
-      <p class="lead">Você corre 5 km com a cidade inteira, de graça, com música acompanhando o pelotão — e cruza a linha de chegada na porta de uma festa com 3 atrações. Quem tem ingresso entra direto.</p>
+      <p class="lead">Você corre 5 km de graça, como num treino da Gang — com música e som no meio do pelotão — e cruza a linha de chegada na porta de uma festa com 3 atrações. Quem tem ingresso entra direto.</p>
     </div>
     <div class="duo rv">
       <div class="moment">
         <div class="k">Momento 1 · O corre</div>
         <h3>5K com trilha sonora</h3>
-        <p>Percurso de 5 km pelas ruas de Umuarama, aberto a qualquer pessoa — caixas de som móveis no meio do pelotão. Nunca correu 5K? 75% da Gang fez o primeiro com a gente.</p>
+        <p>Um 5K como os treinos da Gang: percurso aberto a qualquer pessoa, com caixas de som no meio do pelotão. Nunca correu 5K? 75% da Gang fez o primeiro com a gente.</p>
         <span class="badge">Livre e gratuito · leve quem você quiser</span>
       </div>
       <div class="moment">
