@@ -248,6 +248,19 @@ section[id]{scroll-margin-top:72px}
 .modal.done form{display:none}
 .modal.done .ok{display:block}
 .modal .err{display:none;color:#E8622C;font-size:.85rem;margin-top:10px}
+/* termo de participação */
+.termo{margin-top:18px;font-size:.82rem;color:var(--muted)}
+.termo details{background:var(--bg);border:1px solid var(--line);border-radius:10px;margin-bottom:12px}
+.termo summary{cursor:pointer;padding:11px 14px;font-family:var(--mono);font-size:.68rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text);list-style:none}
+.termo summary::-webkit-details-marker{display:none}
+.termo summary::before{content:"› ";color:var(--accent)}
+.termo details[open] summary::before{content:"⌄ "}
+.termo .t-body{padding:0 14px 12px;line-height:1.55}
+.termo .t-body li{margin:6px 0 6px 16px}
+.termo .check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.termo .check input{width:auto;margin-top:4px;accent-color:var(--accent);transform:scale(1.25);cursor:pointer}
+.termo .check span strong{color:var(--text)}
 </style>
 </head>
 <body>
@@ -431,6 +444,21 @@ section[id]{scroll-margin-top:72px}
       <input id="i-zap" name="whatsapp" required maxlength="40" inputmode="tel" autocomplete="tel">
       <label for="i-mail">E-mail</label>
       <input id="i-mail" name="email" type="email" required maxlength="160" autocomplete="email">
+      <div class="termo">
+        <details>
+          <summary>Ler o termo de participação</summary>
+          <div class="t-body">Ao se inscrever, você declara que:
+            <li>participa do corre por conta própria — é um treino livre e gratuito, e a organização <strong style="color:var(--text)">não se responsabiliza por acidentes</strong> ou danos durante o percurso;</li>
+            <li><strong style="color:var(--text)">autoriza o uso da sua imagem</strong> em fotos e vídeos do evento, em qualquer mídia, sem ônus;</li>
+            <li><strong style="color:var(--text)">autoriza o uso e a comercialização dos dados informados</strong> (nome, WhatsApp e e-mail) pela organização e por marcas parceiras do evento.</li>
+            <em style="display:block;margin-top:8px">O termo completo estará disponível aqui em breve.</em>
+          </div>
+        </details>
+        <label class="check" for="i-termo">
+          <input id="i-termo" type="checkbox" required>
+          <span><strong>Li e aceito o termo de participação</strong> — responsabilidade, uso de imagem e uso dos meus dados.</span>
+        </label>
+      </div>
       <button class="btn" type="submit" id="i-send">Confirmar inscrição grátis</button>
       <div class="err" id="i-err">Não foi possível enviar. Tenta de novo.</div>
     </form>
@@ -456,6 +484,20 @@ section[id]{scroll-margin-top:72px}
       <input id="f-tel" name="telefone" required maxlength="40" inputmode="tel" autocomplete="tel">
       <label for="f-emp">Empresa</label>
       <input id="f-emp" name="empresa" required maxlength="120" autocomplete="organization">
+      <div class="termo">
+        <details>
+          <summary>Ler o termo</summary>
+          <div class="t-body">Ao enviar, você declara que:
+            <li><strong style="color:var(--text)">autoriza o contato comercial</strong> da organização pelos dados informados;</li>
+            <li><strong style="color:var(--text)">autoriza o uso e a comercialização dos dados informados</strong> (nome, telefone e empresa) pela organização do evento.</li>
+            <em style="display:block;margin-top:8px">O termo completo estará disponível aqui em breve.</em>
+          </div>
+        </details>
+        <label class="check" for="f-termo">
+          <input id="f-termo" type="checkbox" required>
+          <span><strong>Li e aceito o termo</strong> — contato comercial e uso dos meus dados.</span>
+        </label>
+      </div>
       <button class="btn" type="submit" id="f-send">Enviar e acessar o deck</button>
       <div class="err" id="f-err">Não foi possível enviar. Tenta de novo.</div>
     </form>
@@ -626,7 +668,8 @@ document.getElementById("form-pat").addEventListener("submit", function(e){
     body: JSON.stringify({
       p_nome: document.getElementById("f-nome").value,
       p_telefone: document.getElementById("f-tel").value,
-      p_empresa: document.getElementById("f-emp").value
+      p_empresa: document.getElementById("f-emp").value,
+      p_termo: document.getElementById("f-termo").checked
     })
   }).then(function(r){
     if(!r.ok) throw 0;
@@ -657,7 +700,8 @@ document.getElementById("form-insc").addEventListener("submit", function(e){
     body: JSON.stringify({
       p_nome: document.getElementById("i-nome").value,
       p_whatsapp: document.getElementById("i-zap").value,
-      p_email: document.getElementById("i-mail").value
+      p_email: document.getElementById("i-mail").value,
+      p_termo: document.getElementById("i-termo").checked
     })
   }).then(function(r){
     if(!r.ok) throw 0;
