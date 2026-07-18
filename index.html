@@ -67,8 +67,9 @@ p{max-width:64ch}
 
 /* hero */
 .hero{position:relative;margin:1rem;border-radius:var(--radius);overflow:hidden;background:var(--bg-2);
-  display:flex;flex-direction:column;align-items:center;text-align:center;padding:118px 20px 0}
-@media (max-width:640px){.hero{padding-top:100px;margin:.6rem}}
+  display:flex;flex-direction:column;align-items:center;text-align:center;padding:66px 20px 0}
+@media (max-width:640px){.hero{padding-top:62px;margin:.6rem}}
+.hero .inner{padding:54px 0 76px}
 .hero canvas{position:absolute;inset:0;width:100%;height:100%}
 .hero .inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
 .hero .logo{display:block;width:min(170px,40vw);height:auto;margin-bottom:26px;filter:drop-shadow(0 20px 50px rgba(0,0,0,.6))}
@@ -84,7 +85,7 @@ p{max-width:64ch}
   text-transform:uppercase;color:var(--accent);font-variant-numeric:tabular-nums}
 .cta-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px}
 @media (max-width:640px){.cta-row{flex-direction:column;width:100%;max-width:340px}.cta-row .btn{width:100%;justify-content:center}}
-.reel{position:relative;z-index:2;width:calc(100% + 40px);margin:52px -20px 0;aspect-ratio:16/9;background:#0B0A07}
+.reel{position:relative;z-index:2;width:calc(100% + 40px);margin:0 -20px;aspect-ratio:16/9;background:#0B0A07}
 .reel video{display:block;width:100%;height:100%;object-fit:cover}
 .reel-ui{position:absolute;right:14px;bottom:14px;z-index:3;display:flex;gap:8px}
 .vbtn{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-family:var(--mono);font-size:.72rem;font-weight:600;
@@ -149,10 +150,37 @@ section[id]{scroll-margin-top:72px}
 .panel .desc{color:var(--muted);max-width:60ch;margin-bottom:24px}
 .panel .desc strong{color:var(--text)}
 .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media (max-width:700px){.gal{grid-template-columns:repeat(2,1fr)}}
-.gal img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--surface);
-  transition:transform .4s cubic-bezier(.23,1,.32,1)}
-.gal img:hover{transform:scale(1.03)}
+@media (max-width:700px){.gal{grid-template-columns:repeat(3,1fr);gap:8px}}
+.gal .th{position:relative;display:block;width:100%;aspect-ratio:4/3;border:none;padding:0;cursor:pointer;
+  border-radius:10px;overflow:hidden;background:var(--surface)}
+.gal .th img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s cubic-bezier(.23,1,.32,1)}
+.gal .th:hover img{transform:scale(1.05)}
+.gal .th:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gal .th.more::after{content:attr(data-more);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(17,16,9,.72);color:var(--text);font-family:var(--display);font-size:1.6rem;letter-spacing:.02em}
+
+/* lightbox — revista de fotos */
+.lb{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;background:rgba(10,9,6,.96);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.lb.on{display:flex}
+.lb .top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px}
+.lb .cap{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lb .cap strong{color:var(--text)}
+.lb .x{background:none;border:none;color:var(--text);font-size:1.8rem;cursor:pointer;line-height:1;padding:4px 8px}
+.lb .stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  touch-action:pan-y;user-select:none}
+.lb .stage img{max-width:94vw;max-height:calc(100svh - 150px);border-radius:10px;
+  transition:opacity .25s ease;pointer-events:none}
+.lb .nav-b{position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  background:rgba(17,16,9,.6);border:1px solid var(--line);color:var(--text);
+  width:46px;height:46px;border-radius:99px;cursor:pointer;font-size:1.3rem;
+  display:flex;align-items:center;justify-content:center;transition:border-color .3s}
+.lb .nav-b:hover{border-color:var(--accent)}
+.lb .prev{left:14px}.lb .next{right:14px}
+@media (max-width:640px){.lb .nav-b{display:none}}
+.lb .foot{padding:14px 20px 22px;text-align:center;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.lb .foot .n{color:var(--accent);font-variant-numeric:tabular-nums}
 
 /* faq */
 .faq{margin-top:44px;border-top:1px solid var(--line)}
@@ -213,10 +241,18 @@ section[id]{scroll-margin-top:72px}
 <!-- HERO -->
 <header class="hero">
   <canvas id="fx-hero" aria-hidden="true"></canvas>
+  <figure class="reel">
+    <video id="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
+      <source src="assets/hero.mp4" type="video/mp4">
+    </video>
+    <div class="reel-ui">
+      <button class="vbtn" id="btn-som" type="button" aria-label="Ativar som do vídeo">🔇 Ativar som</button>
+    </div>
+  </figure>
   <div class="inner">
     <img class="logo" alt="Gang Corre Party" src="assets/logo-gcp-white.png">
-    <h1>O corre é <em>grátis.</em><br>A festa é histórica.</h1>
-    <p class="tag">O aniversário de 1 ano da Running Gang: 5K aberto à cidade inteira que termina numa festa com 3 atrações no palco. Uma noite só.</p>
+    <h1>A festa de <em>1 ano</em> da Running Gang</h1>
+    <p class="tag">Não existe momento melhor: a experiência mais divertida e diferente que você vai viver esse ano com a Gang. Um corre de 5K grátis pela cidade inteira que termina numa festa com 3 atrações no palco.</p>
     <div class="info">
       <span><strong>29/08</strong> · sábado</span>
       <span><strong>Espaço Seu Jorge</strong> · Umuarama-PR</span>
@@ -229,14 +265,6 @@ section[id]{scroll-margin-top:72px}
       <button class="btn ghost" type="button" data-patrocinio>Quero patrocinar o evento</button>
     </div>
   </div>
-  <figure class="reel">
-    <video id="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
-      <source src="assets/hero.mp4" type="video/mp4">
-    </video>
-    <div class="reel-ui">
-      <button class="vbtn" id="btn-som" type="button" aria-label="Ativar som do vídeo">🔇 Ativar som</button>
-    </div>
-  </figure>
 </header>
 
 <!-- O EVENTO -->
@@ -345,6 +373,20 @@ section[id]{scroll-margin-top:72px}
   </div>
 </footer>
 
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Galeria de fotos">
+  <div class="top">
+    <div class="cap" id="lb-cap"></div>
+    <button class="x" type="button" id="lb-x" aria-label="Fechar">×</button>
+  </div>
+  <div class="stage" id="lb-stage">
+    <button class="nav-b prev" type="button" id="lb-prev" aria-label="Foto anterior">‹</button>
+    <img id="lb-img" alt="">
+    <button class="nav-b next" type="button" id="lb-next" aria-label="Próxima foto">›</button>
+  </div>
+  <div class="foot"><span class="n" id="lb-n"></span> · arrasta pro lado pra ver mais</div>
+</div>
+
 <!-- MODAL PATROCÍNIO -->
 <div class="modal" id="modal-pat" role="dialog" aria-modal="true" aria-label="Quero patrocinar">
   <div class="back" data-close></div>
@@ -403,14 +445,60 @@ EVENTOS.forEach(function(ev, i){
   var p = document.createElement("div");
   p.className = "panel" + (i===0?" on":"");
   p.id = "p-"+ev.slug;
-  var imgs = "";
-  for(var k=1;k<=ev.n;k++){
+  var MOSTRA = 6, thumbs = "";
+  for(var k=1;k<=Math.min(MOSTRA, ev.n);k++){
     var nn = (k<10?"0":"")+k;
-    imgs += '<img src="assets/eventos/'+ev.slug+'/'+nn+'.jpg" alt="'+ev.nome+' — foto '+k+'" loading="lazy" decoding="async">';
+    var more = (k===MOSTRA && ev.n>MOSTRA) ? ' more" data-more="+'+(ev.n-MOSTRA+1)+' fotos' : '';
+    thumbs += '<button class="th'+more+'" type="button" data-ev="'+i+'" data-k="'+(k-1)+'" aria-label="Abrir foto '+k+' de '+ev.nome+'">'
+      + '<img src="assets/eventos/'+ev.slug+'/'+nn+'.jpg" alt="'+ev.nome+' — foto '+k+'" loading="lazy" decoding="async"></button>';
   }
-  p.innerHTML = '<p class="desc">'+ev.desc+'</p><div class="gal">'+imgs+'</div>';
+  p.innerHTML = '<p class="desc">'+ev.desc+'</p><div class="gal">'+thumbs+'</div>';
   panels.appendChild(p);
 });
+
+/* lightbox */
+var lb = document.getElementById("lb"), lbImg = document.getElementById("lb-img"),
+    lbCap = document.getElementById("lb-cap"), lbN = document.getElementById("lb-n"),
+    cur = {ev:0, k:0};
+function src(ev,k){ var n=k+1; return "assets/eventos/"+EVENTOS[ev].slug+"/"+(n<10?"0":"")+n+".jpg"; }
+function show(ev,k){
+  var E = EVENTOS[ev];
+  cur = {ev:ev, k:(k+E.n)%E.n};
+  lbImg.style.opacity = 0;
+  var im = new Image();
+  im.onload = function(){ lbImg.src = im.src; lbImg.style.opacity = 1; };
+  im.src = src(ev, cur.k);
+  lbImg.alt = E.nome + " — foto " + (cur.k+1);
+  lbCap.innerHTML = "<strong>" + E.nome + "</strong>";
+  lbN.textContent = (cur.k+1) + " / " + E.n;
+  new Image().src = src(ev, (cur.k+1)%E.n);
+}
+panels.addEventListener("click", function(e){
+  var t = e.target.closest(".th");
+  if(!t) return;
+  lb.classList.add("on");
+  document.body.style.overflow = "hidden";
+  show(+t.dataset.ev, +t.dataset.k);
+});
+function lbClose(){ lb.classList.remove("on"); document.body.style.overflow = ""; }
+document.getElementById("lb-x").addEventListener("click", lbClose);
+document.getElementById("lb-prev").addEventListener("click", function(){ show(cur.ev, cur.k-1); });
+document.getElementById("lb-next").addEventListener("click", function(){ show(cur.ev, cur.k+1); });
+document.addEventListener("keydown", function(e){
+  if(!lb.classList.contains("on")) return;
+  if(e.key==="Escape") lbClose();
+  if(e.key==="ArrowLeft") show(cur.ev, cur.k-1);
+  if(e.key==="ArrowRight") show(cur.ev, cur.k+1);
+});
+var sx = null;
+var stage = document.getElementById("lb-stage");
+stage.addEventListener("touchstart", function(e){ sx = e.touches[0].clientX; }, {passive:true});
+stage.addEventListener("touchend", function(e){
+  if(sx === null) return;
+  var dx = e.changedTouches[0].clientX - sx; sx = null;
+  if(Math.abs(dx) > 40) show(cur.ev, cur.k + (dx < 0 ? 1 : -1));
+}, {passive:true});
+stage.addEventListener("click", function(e){ if(e.target === stage) lbClose(); });
 
 /* reveal */
 var io = new IntersectionObserver(function(es){
