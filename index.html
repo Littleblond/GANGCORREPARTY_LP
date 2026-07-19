@@ -227,11 +227,12 @@ section[id]{scroll-margin-top:72px}
 .final .rule{height:5px;border-radius:3px;margin-top:36px;max-width:480px;background:linear-gradient(90deg,var(--accent),transparent)}
 
 /* modal patrocínio */
-.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .modal.on{display:flex}
 .modal .back{position:absolute;inset:0;background:rgba(8,10,14,.8);backdrop-filter:blur(6px)}
 .modal .box{position:relative;z-index:2;width:min(440px,100%);background:var(--surface-2);
-  border:1px solid var(--line);border-radius:var(--radius);padding:36px 30px}
+  border:1px solid var(--line);border-radius:var(--radius);padding:36px 30px;
+  max-height:min(88svh,720px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal h3{font-size:1.9rem;text-transform:uppercase;margin-bottom:6px}
 .modal .sub{font-size:.92rem;margin-bottom:22px}
 .modal label{display:block;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.14em;
@@ -484,20 +485,7 @@ section[id]{scroll-margin-top:72px}
       <input id="f-tel" name="telefone" required maxlength="40" inputmode="tel" autocomplete="tel">
       <label for="f-emp">Empresa</label>
       <input id="f-emp" name="empresa" required maxlength="120" autocomplete="organization">
-      <div class="termo">
-        <details>
-          <summary>Ler o termo</summary>
-          <div class="t-body">Ao enviar, você declara que:
-            <li><strong style="color:var(--text)">autoriza o contato comercial</strong> da organização pelos dados informados;</li>
-            <li><strong style="color:var(--text)">autoriza o uso e a comercialização dos dados informados</strong> (nome, telefone e empresa) pela organização do evento.</li>
-            <em style="display:block;margin-top:8px">O termo completo estará disponível aqui em breve.</em>
-          </div>
-        </details>
-        <label class="check" for="f-termo">
-          <input id="f-termo" type="checkbox" required>
-          <span><strong>Li e aceito o termo</strong> — contato comercial e uso dos meus dados.</span>
-        </label>
-      </div>
+      <p class="mini-note" style="margin-top:14px">Seus dados são usados só pra entrarmos em contato sobre o patrocínio.</p>
       <button class="btn" type="submit" id="f-send">Enviar e acessar o deck</button>
       <div class="err" id="f-err">Não foi possível enviar. Tenta de novo.</div>
     </form>
@@ -668,8 +656,7 @@ document.getElementById("form-pat").addEventListener("submit", function(e){
     body: JSON.stringify({
       p_nome: document.getElementById("f-nome").value,
       p_telefone: document.getElementById("f-tel").value,
-      p_empresa: document.getElementById("f-emp").value,
-      p_termo: document.getElementById("f-termo").checked
+      p_empresa: document.getElementById("f-emp").value
     })
   }).then(function(r){
     if(!r.ok) throw 0;
