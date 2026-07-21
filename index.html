@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gang Corre Party · 29/08 · Umuarama-PR</title>
-<meta name="description" content="O corre termina onde a festa começa. Um 5K gratuito com música no pelotão e, depois, a festa de 1 ano da Running Gang com 3 atrações no palco. 29/08, Espaço Seu Jorge, Umuarama-PR. Participe de um ou viva os dois.">
+<meta name="description" content="O corre termina onde a festa começa. Um 5KM gratuito com música no pelotão e, depois, a festa de 1 ano da Running Gang com 3 atrações no palco. 29/08, Espaço Seu Jorge, Umuarama-PR. Participe de um ou viva os dois.">
 <link rel="canonical" href="https://gangcorreparty-lp.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Gang Corre Party · 29/08 · Umuarama-PR">
-<meta property="og:description" content="5K gratuito + festa com ingresso. Participe de um ou viva os dois. A festa de 1 ano da Running Gang, dia 29/08 no Espaço Seu Jorge.">
+<meta property="og:description" content="5KM gratuito + festa com ingresso. Participe de um ou viva os dois. A festa de 1 ano da Running Gang, dia 29/08 no Espaço Seu Jorge.">
 <meta property="og:image" content="https://gangcorreparty-lp.vercel.app/assets/hero-poster.jpg">
 <meta property="og:url" content="https://gangcorreparty-lp.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
@@ -219,7 +219,7 @@ section[id]{scroll-margin-top:72px}
 
 /* festa block */
 .festa{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid rgba(77,141,255,.4);border-radius:var(--radius);padding:44px 34px}
-.festa .price{font-family:var(--display);font-size:clamp(2.4rem,6vw,3.4rem);color:var(--accent);line-height:1;margin:6px 0 4px}
+.festa .price{font-family:var(--display);font-size:clamp(1.9rem,5vw,2.8rem);color:var(--accent);line-height:1;margin:6px 0 4px;text-transform:uppercase}
 .festa .price small{font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;display:block;margin-top:8px;font-weight:600}
 .festa .facts{display:flex;flex-wrap:wrap;gap:10px 22px;margin:18px 0;font-family:var(--mono);font-size:.82rem;color:var(--muted)}
 .festa .facts strong{color:var(--text)}
@@ -227,6 +227,12 @@ section[id]{scroll-margin-top:72px}
 .festa .atr .slot{background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:12px 16px;font-family:var(--mono);font-size:.84rem;color:var(--muted)}
 .festa .aviso{margin-top:14px;font-size:.82rem;color:var(--muted)}
 .festa .aviso b{color:var(--text)}
+.vip-note{display:flex;gap:12px;align-items:flex-start;margin-top:18px;background:var(--accent-dim);
+  border:1px solid rgba(77,141,255,.35);border-radius:12px;padding:14px 18px;font-size:.9rem;color:var(--text)}
+.vip-note strong{color:var(--accent)}
+.vip-note .vip-dot{flex:none;width:9px;height:9px;border-radius:99px;background:var(--accent);margin-top:6px;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+@media (prefers-reduced-motion:reduce){.vip-note .vip-dot{animation:none}}
 
 /* faq */
 .faq{margin-top:34px;border-top:1px solid var(--line)}
@@ -301,7 +307,7 @@ section[id]{scroll-margin-top:72px}
 
 <nav class="nav">
   <img class="rg" src="assets/logo-rg-white.png" alt="Running Gang">
-  <button class="btn sm nav-cta js-buy" type="button">Garantir ingresso da festa</button>
+  <button class="btn sm nav-cta js-buy" type="button">Entrar no grupo VIP</button>
 </nav>
 
 <!-- 1. HERO -->
@@ -314,21 +320,21 @@ section[id]{scroll-margin-top:72px}
     </div>
     <p class="brandline">Gang Corre Party · 1 ano da Running Gang</p>
     <h1>O corre termina onde a <em>festa</em> começa</h1>
-    <p class="explain">Um 5K gratuito com música no pelotão e, depois, a festa de 1 ano da Running Gang com três atrações no palco.</p>
+    <p class="explain">Um 5KM gratuito com música no pelotão e, depois, a festa de 1 ano da Running Gang com três atrações no palco.</p>
     <div class="info">
       <span><strong>29 de agosto</strong></span>
       <span><strong>Espaço Seu Jorge</strong></span>
       <span>Umuarama-PR</span>
-      <span><strong>20h</strong> 5K · <strong>21h</strong> festa</span>
+      <span><strong>20h</strong> 5KM · <strong>21h</strong> festa</span>
     </div>
-    <div class="clarify"><b>5K gratuito + festa com ingresso.</b> Participe de um ou viva os dois.</div>
+    <div class="clarify"><b>5KM gratuito + festa com ingresso.</b> Participe de um ou viva os dois.</div>
     <div class="count-wrap">
       <div class="count-label">Contagem regressiva para a Gang Corre Party</div>
       <div class="count-grid js-count" aria-hidden="true"></div>
     </div>
     <div class="cta-row" id="hero-cta">
-      <button class="btn big js-buy" type="button">🎟 Garantir ingresso da festa</button>
-      <button class="btn ghost js-insc" type="button">🏃 Inscrever-me no 5K</button>
+      <button class="btn big js-buy" type="button">🔥 Entrar no grupo VIP</button>
+      <button class="btn ghost js-insc" type="button">🏃 Inscrever-me no 5KM</button>
     </div>
   </div>
 </header>
@@ -337,7 +343,6 @@ section[id]{scroll-margin-top:72px}
 <section class="videosec" aria-label="Vídeo do evento">
   <figure class="reel">
     <video id="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg"></video>
-    <div class="reel-copy" id="reel-copy" aria-hidden="true"><span id="reel-line"></span></div>
     <div class="reel-ui">
       <button class="vbtn" id="btn-som" type="button" aria-label="Ativar som do vídeo">🔇 Ativar som</button>
     </div>
@@ -356,30 +361,30 @@ section[id]{scroll-margin-top:72px}
     <div class="duo rv">
       <div class="card2">
         <div class="k">Momento 1 · de dia</div>
-        <h3>5K gratuito</h3>
+        <h3>5KM gratuito</h3>
         <div class="price-tag">Gratuito</div>
-        <p>Um corre no estilo da Gang: todo mundo junto, música no pelotão e uma experiência feita pra quem quer viver os 5K de um jeito diferente. Você pode participar mesmo sem realizar a inscrição. Só os inscritos concorrem aos sorteios da campanha.</p>
+        <p>Um corre no estilo da Gang: todo mundo junto, música no pelotão e uma experiência feita pra quem quer viver os 5KM de um jeito diferente. Você pode participar mesmo sem realizar a inscrição. Só os inscritos concorrem aos sorteios da campanha.</p>
         <ul>
           <li>Participação gratuita</li>
           <li>Inscrição opcional para correr</li>
           <li>Inscrição necessária para concorrer aos sorteios</li>
           <li class="no">A inscrição não inclui acesso à festa</li>
         </ul>
-        <button class="btn ghost js-insc" type="button">Inscrever-me no 5K</button>
+        <button class="btn ghost js-insc" type="button">Inscrever-me no 5KM</button>
       </div>
       <div class="card2 paid">
         <div class="k">Momento 2 · à noite</div>
         <h3>Festa com ingresso</h3>
-        <div class="price-tag">Ingresso à parte · [INSERIR PREÇO]</div>
-        <p>Depois do corre, o Espaço Seu Jorge recebe a comemoração de 1 ano da Running Gang, com três atrações no palco. Você pode ir somente à festa. Não é necessário participar do 5K.</p>
+        <div class="price-tag">1º lote: quinta, 19h · no grupo VIP</div>
+        <p>Depois do corre, o Espaço Seu Jorge recebe a comemoração de 1 ano da Running Gang, com três atrações no palco. Você pode ir somente à festa. Não é necessário participar do 5KM.</p>
         <ul>
           <li>Festa com ingresso pago</li>
           <li>Três atrações no palco</li>
           <li>Participação independente do corre</li>
-          <li class="no">Ingresso vendido separadamente do 5K</li>
+          <li class="no">Ingresso vendido separadamente do 5KM</li>
         </ul>
-        <button class="btn js-buy" type="button">Garantir ingresso da festa</button>
-        <div class="note">Não é necessário correr para participar da festa.</div>
+        <button class="btn js-buy" type="button">Entrar no grupo VIP</button>
+        <div class="note">O 1º lote abre quinta, 19h, direto no grupo VIP. Não precisa correr pra ir à festa.</div>
       </div>
     </div>
   </div>
@@ -391,13 +396,13 @@ section[id]{scroll-margin-top:72px}
     <div class="rv">
       <div class="eyebrow">Como é o dia</div>
       <h2>Primeiro o corre. Depois a festa.</h2>
-      <p class="lead">De dia, um 5K com som no meio do pelotão, do jeito que só a Gang faz. À noite, a comemoração de 1 ano no palco do Espaço Seu Jorge. Duas experiências, um dia só, e você escolhe como viver.</p>
+      <p class="lead">De dia, um 5KM com som no meio do pelotão, do jeito que só a Gang faz. À noite, a comemoração de 1 ano no palco do Espaço Seu Jorge. Duas experiências, um dia só, e você escolhe como viver.</p>
     </div>
     <div class="two-step rv">
       <div class="ts">
         <div class="when">De dia · 20h</div>
-        <h3>O 5K</h3>
-        <p>Concentração, aquecimento e largada às 20h. Percurso com música acompanhando o pelotão. Gratuito, aberto a qualquer ritmo. Nunca correu 5K? 75% da Gang fez o primeiro com a gente.</p>
+        <h3>O 5KM</h3>
+        <p>Concentração, aquecimento e largada às 20h. Percurso com música acompanhando o pelotão. Gratuito, aberto a qualquer ritmo. Nunca correu 5KM? 75% da Gang fez o primeiro com a gente.</p>
       </div>
       <div class="ts">
         <div class="when">À noite · 21h</div>
@@ -418,7 +423,7 @@ section[id]{scroll-margin-top:72px}
     </div>
     <div class="stats2 rv">
       <div class="stat"><div class="n">750+</div><div class="l">pessoas no nosso maior evento</div></div>
-      <div class="stat"><div class="n">75%</div><div class="l">fizeram o primeiro 5K da vida num evento da Gang</div></div>
+      <div class="stat"><div class="n">75%</div><div class="l">fizeram o primeiro 5KM da vida num evento da Gang</div></div>
     </div>
 
     <!-- 10. IMAGENS DA COMUNIDADE -->
@@ -438,11 +443,11 @@ section[id]{scroll-margin-top:72px}
     <div class="sorteio rv">
       <div class="eyebrow">Vai correr com a gente?</div>
       <h2>Vai correr com a Gang?</h2>
-      <p>Você pode participar do 5K mesmo sem preencher a inscrição.</p>
+      <p>Você pode participar do 5KM mesmo sem preencher a inscrição.</p>
       <p>Mas, para concorrer aos sorteios realizados durante a campanha de lançamento, é necessário estar inscrito gratuitamente no corre.</p>
-      <div class="warn">A inscrição no 5K não inclui o ingresso da festa.</div>
+      <div class="warn">A inscrição no 5KM não inclui o ingresso da festa.</div>
       <div class="cta-row">
-        <button class="btn js-insc" type="button">🏃 Inscrever-me no 5K</button>
+        <button class="btn js-insc" type="button">🏃 Inscrever-me no 5KM</button>
       </div>
     </div>
   </div>
@@ -458,7 +463,7 @@ section[id]{scroll-margin-top:72px}
     </div>
     <div class="festa rv">
       <div class="k eyebrow" style="margin-bottom:4px">Gang Corre Party · Festa</div>
-      <div class="price">[INSERIR PREÇO]<small>Ingresso da festa</small></div>
+      <div class="price">VALOR SURPRESA<small>1º lote e todos os valores lançam quinta, 19h, no grupo VIP</small></div>
       <div class="facts">
         <span><strong>29/08</strong> · sábado</span>
         <span><strong>21h</strong> · início da festa</span>
@@ -470,14 +475,18 @@ section[id]{scroll-margin-top:72px}
         <div class="slot">2ª atração · [INSERIR NOME DAS ATRAÇÕES]</div>
         <div class="slot">3ª atração · [INSERIR NOME DAS ATRAÇÕES]</div>
       </div>
-      <div class="count-wrap" style="align-items:flex-start;margin-top:20px">
-        <div class="count-label">Contagem regressiva para a festa</div>
+      <div class="vip-note">
+        <span class="vip-dot"></span>
+        <div><strong>As vendas ainda não abriram.</strong> O 1º lote (promocional) e os valores de todos os lotes lançam <strong>quinta-feira, às 19h, direto no grupo VIP.</strong> Entra agora pra receber o link em primeira mão.</div>
+      </div>
+      <div class="count-wrap" style="align-items:flex-start;margin-top:22px">
+        <div class="count-label">Contagem regressiva para a Gang Corre Party</div>
         <div class="count-grid js-count" aria-hidden="true"></div>
       </div>
       <div class="cta-row" style="justify-content:flex-start;margin-top:24px">
-        <button class="btn big js-buy" type="button">🎟 Garantir ingresso da festa</button>
+        <button class="btn big js-buy" type="button">🔥 Entrar no grupo VIP</button>
       </div>
-      <p class="aviso"><b>O ingresso da festa é vendido separadamente do 5K.</b> A inscrição no corre não dá acesso à festa.</p>
+      <p class="aviso"><b>O ingresso da festa é vendido separadamente do 5KM.</b> A inscrição no corre não dá acesso à festa.</p>
     </div>
   </div>
 </section>
@@ -490,16 +499,16 @@ section[id]{scroll-margin-top:72px}
       <h2>Ficou alguma dúvida?</h2>
     </div>
     <div class="faq rv">
-      <details><summary>O 5K é gratuito?</summary><div class="a">Sim. O 5K é <b>totalmente gratuito</b>. É só chegar no ponto de largada no dia 29/08.</div></details>
+      <details><summary>O 5KM é gratuito?</summary><div class="a">Sim. O 5KM é <b>totalmente gratuito</b>. É só chegar no ponto de largada no dia 29/08.</div></details>
       <details><summary>Preciso me inscrever para correr?</summary><div class="a">Não. A inscrição <b>não é obrigatória</b> para participar do corre. Você pode correr mesmo sem se inscrever.</div></details>
-      <details><summary>Por que devo me inscrever no 5K?</summary><div class="a">A inscrição é gratuita e é o que coloca você para <b>concorrer aos sorteios</b> da campanha de lançamento. Sem inscrição, você corre, mas não participa dos sorteios.</div></details>
-      <details><summary>A inscrição no 5K dá acesso à festa?</summary><div class="a">Não. A inscrição no corre <b>não inclui o ingresso da festa</b>. São coisas separadas.</div></details>
+      <details><summary>Por que devo me inscrever no 5KM?</summary><div class="a">A inscrição é gratuita e é o que coloca você para <b>concorrer aos sorteios</b> da campanha de lançamento. Sem inscrição, você corre, mas não participa dos sorteios.</div></details>
+      <details><summary>A inscrição no 5KM dá acesso à festa?</summary><div class="a">Não. A inscrição no corre <b>não inclui o ingresso da festa</b>. São coisas separadas.</div></details>
       <details><summary>Preciso correr para ir à festa?</summary><div class="a">Não. Você pode ir <b>somente à festa</b>, com ingresso, sem participar do corre.</div></details>
-      <details><summary>Posso participar somente do corre?</summary><div class="a">Sim. Dá para viver só o 5K, de graça, sem comprar ingresso da festa.</div></details>
+      <details><summary>Posso participar somente do corre?</summary><div class="a">Sim. Dá para viver só o 5KM, de graça, sem comprar ingresso da festa.</div></details>
       <details><summary>Posso participar somente da festa?</summary><div class="a">Sim. Basta o ingresso da festa. Não é necessário correr.</div></details>
       <details><summary>Posso participar dos dois?</summary><div class="a">Sim. Corre de dia e curte a festa à noite. As duas experiências acontecem no mesmo dia.</div></details>
-      <details><summary>Como compro o ingresso da festa?</summary><div class="a">Pelo botão <b>"Garantir ingresso da festa"</b> aqui na página. O ingresso é vendido separadamente do 5K.</div></details>
-      <details><summary>Onde e quando acontece?</summary><div class="a">Dia <b>29 de agosto</b>, no <b>Espaço Seu Jorge</b>, em Umuarama-PR. Largada do 5K às 20h e início da festa às 21h.</div></details>
+      <details><summary>Como compro o ingresso da festa?</summary><div class="a">As vendas do <b>1º lote (promocional)</b> abrem <b>quinta-feira, às 19h</b>, direto no grupo VIP, junto com os valores de todos os lotes. Entre no grupo pelo botão <b>"Entrar no grupo VIP"</b> pra receber o link em primeira mão. O ingresso é vendido separadamente do 5KM.</div></details>
+      <details><summary>Onde e quando acontece?</summary><div class="a">Dia <b>29 de agosto</b>, no <b>Espaço Seu Jorge</b>, em Umuarama-PR. Largada do 5KM às 20h e início da festa às 21h.</div></details>
       <details><summary>Quantas atrações haverá na festa?</summary><div class="a"><b>Três atrações</b> no palco durante a noite. Os nomes são divulgados nas redes da Gang (@runninggang_br).</div></details>
     </div>
   </div>
@@ -511,10 +520,10 @@ section[id]{scroll-margin-top:72px}
   <div class="inner">
     <div class="eyebrow">Dia 29 de agosto</div>
     <h2>Bora viver esse dia?</h2>
-    <p class="sub" style="max-width:44ch">Escolha o seu momento: o 5K gratuito, a festa com ingresso, ou os dois.</p>
+    <p class="sub" style="max-width:44ch">Escolha o seu momento: o 5KM gratuito, a festa com ingresso, ou os dois.</p>
     <div class="cta-row" style="margin-top:28px">
-      <button class="btn big js-buy" type="button">🎟 Garantir ingresso da festa</button>
-      <button class="btn ghost js-insc" type="button">🏃 Inscrever-me no 5K</button>
+      <button class="btn big js-buy" type="button">🔥 Entrar no grupo VIP</button>
+      <button class="btn ghost js-insc" type="button">🏃 Inscrever-me no 5KM</button>
     </div>
     <div class="logos">
       <img src="assets/logo-gcp-white.png" alt="Gang Corre Party">
@@ -531,8 +540,8 @@ section[id]{scroll-margin-top:72px}
 
 <!-- STICKY MOBILE -->
 <div class="stickybar" id="stickybar">
-  <button class="btn js-buy" type="button">🎟 Garantir ingresso da festa</button>
-  <button class="btn ghost js-insc" type="button" aria-label="Inscrever-me no 5K">🏃 5K</button>
+  <button class="btn js-buy" type="button">🔥 Entrar no grupo VIP</button>
+  <button class="btn ghost js-insc" type="button" aria-label="Inscrever-me no 5KM">🏃 5KM</button>
 </div>
 
 <!-- LIGHTBOX -->
@@ -546,12 +555,24 @@ section[id]{scroll-margin-top:72px}
   <div class="foot" style="padding-bottom:22px"><span class="n" id="lb-n"></span> · arrasta pro lado</div>
 </div>
 
+<!-- MODAL GRUPO VIP -->
+<div class="modal" id="modal-vip" role="dialog" aria-modal="true" aria-label="Grupo VIP">
+  <div class="back" data-close-vip></div>
+  <div class="box">
+    <button class="x" type="button" data-close-vip aria-label="Fechar">×</button>
+    <h3>Entre no grupo VIP</h3>
+    <p class="sub">As vendas do ingresso da festa ainda não abriram. O <strong style="color:var(--accent)">1º lote promocional</strong> e os valores de todos os lotes lançam <strong style="color:var(--accent)">quinta-feira, às 19h</strong>, direto no grupo VIP. Entre agora e receba o link em primeira mão.</p>
+    <a class="btn js-vip-link" href="#" target="_blank" rel="noopener">🔥 Entrar no grupo VIP</a>
+    <p class="sub" style="margin-top:16px;font-size:.8rem">A festa é vendida separadamente do 5KM. Quer só correr? A inscrição no 5KM é gratuita e fica na página.</p>
+  </div>
+</div>
+
 <!-- MODAL INSCRIÇÃO -->
-<div class="modal" id="modal-insc" role="dialog" aria-modal="true" aria-label="Inscrição no 5K">
+<div class="modal" id="modal-insc" role="dialog" aria-modal="true" aria-label="Inscrição no 5KM">
   <div class="back" data-close-insc></div>
   <div class="box">
     <button class="x" type="button" data-close-insc aria-label="Fechar">×</button>
-    <h3>Inscrição no 5K</h3>
+    <h3>Inscrição no 5KM</h3>
     <p class="sub">Gratuita e opcional para correr. Ela coloca você nos <strong style="color:var(--accent)">sorteios da campanha</strong>. Não inclui o ingresso da festa.</p>
     <form id="form-insc">
       <label for="i-nome">Seu nome</label>
@@ -580,8 +601,8 @@ section[id]{scroll-margin-top:72px}
     </form>
     <div class="ok">
       <div class="big">Você tá dentro! 🏃</div>
-      <p class="sub">Inscrição confirmada. Você já está concorrendo aos sorteios da campanha. Dia 29/08, largada do 5K às 20h. Acompanhe o @runninggang_br.</p>
-      <button class="btn js-buy" type="button" data-close-insc>🎟 Garantir ingresso da festa</button>
+      <p class="sub">Inscrição confirmada. Você já está concorrendo aos sorteios da campanha. Dia 29/08, largada do 5KM às 20h. Acompanhe o @runninggang_br.</p>
+      <button class="btn js-buy" type="button" data-close-insc>🔥 Entrar no grupo VIP</button>
     </div>
   </div>
 </div>
@@ -618,36 +639,27 @@ section[id]{scroll-margin-top:72px}
 var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== CONFIG — EDITE AQUI ===== */
-/* Link do checkout da festa. Vazio = leva pro bloco da festa. Cole o link e todos os botões viram compra direta. */
-var CHECKOUT_URL = "";                 /* [INSERIR LINK DO CHECKOUT] */
-var DATA_EVENTO  = "2026-08-29T20:00:00-03:00";
-/* Copys do vídeo — troque as frases aqui, uma por cena. */
-var VIDEO_COPY = [
-  "UM DIA.",
-  "DOIS MOMENTOS.",
-  "PRIMEIRO: UM 5K GRATUITO.",
-  "MÚSICA NO MEIO DO PELOTÃO.",
-  "DEPOIS: A FESTA DE 1 ANO DA GANG.",
-  "3 ATRAÇÕES NO PALCO.",
-  "PARTICIPE DE UM.",
-  "OU VIVA OS DOIS.",
-  "29.08 · ESPAÇO SEU JORGE",
-  "GARANTA SEU INGRESSO DA FESTA."
-];
+/* Link do grupo VIP (WhatsApp/Telegram). É pra onde vai o botão "Entrar no grupo VIP".
+   Enquanto vazio, o botão do modal só mostra o aviso. Cole o link do grupo aqui. */
+var GRUPO_VIP_URL = "";                 /* [INSERIR LINK DO GRUPO VIP] */
+var DATA_EVENTO   = "2026-08-29T20:00:00-03:00";
 var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
 var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
 /* =============================== */
 
 var byId = function(id){ return document.getElementById(id); };
 
-/* ---- CTA da festa (padronizado) ---- */
-function goBuy(){
-  if(CHECKOUT_URL){ window.open(CHECKOUT_URL, "_blank", "noopener"); return; }
-  var f = byId("festa"); if(f){ f.scrollIntoView({behavior: reduced ? "auto" : "smooth"}); }
+/* ---- CTA da festa -> abre modal do grupo VIP (ingresso sai quinta, 19h) ---- */
+var mv = byId("modal-vip");
+document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", function(){ mv.classList.add("on"); }); });
+mv.querySelectorAll("[data-close-vip]").forEach(function(b){ b.addEventListener("click", function(){ mv.classList.remove("on"); }); });
+var vipLink = document.querySelector(".js-vip-link");
+if(vipLink){
+  if(GRUPO_VIP_URL){ vipLink.href = GRUPO_VIP_URL; }
+  else{ vipLink.addEventListener("click", function(e){ e.preventDefault(); vipLink.textContent = "🔧 Link do grupo em breve"; }); }
 }
-document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", goBuy); });
 
-/* ---- CTA do 5K (abre modal) ---- */
+/* ---- CTA do 5KM (abre modal) ---- */
 var mi = byId("modal-insc");
 document.querySelectorAll(".js-insc").forEach(function(b){
   b.addEventListener("click", function(){ mi.classList.add("on"); byId("i-nome").focus(); });
@@ -660,7 +672,7 @@ document.querySelectorAll(".js-patrocinio").forEach(function(b){
   b.addEventListener("click", function(){ mp.classList.add("on"); byId("f-nome").focus(); });
 });
 mp.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click", function(){ mp.classList.remove("on"); }); });
-document.addEventListener("keydown", function(e){ if(e.key==="Escape"){ mi.classList.remove("on"); mp.classList.remove("on"); } });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape"){ mi.classList.remove("on"); mp.classList.remove("on"); mv.classList.remove("on"); } });
 
 /* ---- COUNTDOWN (múltiplas instâncias) ---- */
 var alvo = new Date(DATA_EVENTO).getTime();
@@ -679,11 +691,11 @@ function tickCount(){
 }
 tickCount(); setInterval(tickCount, 1000);
 
-/* ---- VÍDEO: som + copy sobreposta ---- */
-var hv = byId("hero-video"), sbtn = byId("btn-som");
+/* ---- VÍDEO: inicia mudo, usuário libera o som (o vídeo já tem as legendas) ---- */
+var hv = byId("hero-video"), sbtn = byId("btn-som"), tryPlay;
 if(hv){
   var s = document.createElement("source"); s.src="assets/hero.mp4"; s.type="video/mp4"; hv.appendChild(s);
-  var tryPlay = function(){ var p=hv.play(); if(p&&p.catch) p.catch(function(){}); };
+  tryPlay = function(){ var p=hv.play(); if(p&&p.catch) p.catch(function(){}); };
   tryPlay();
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) tryPlay(); });
   addEventListener("touchstart", tryPlay, {once:true, passive:true});
@@ -696,17 +708,6 @@ if(hv && sbtn){
     sbtn.textContent = hv.muted ? "🔇 Ativar som" : "🔊 Som ligado";
   });
 }
-/* copy sobreposta — não depende de áudio */
-var rl = byId("reel-line"), ri = 0;
-function showLine(){
-  if(!rl) return;
-  rl.textContent = VIDEO_COPY[ri];
-  rl.classList.add("on");
-  setTimeout(function(){ rl.classList.remove("on"); }, 2000);
-  ri = (ri+1) % VIDEO_COPY.length;
-}
-if(rl && !reduced){ showLine(); setInterval(showLine, 2600); }
-else if(rl){ rl.textContent = VIDEO_COPY[0]; rl.classList.add("on"); }
 
 /* ---- galerias (eventos anteriores) ---- */
 var EVENTOS = [
