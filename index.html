@@ -594,6 +594,7 @@ section[id]{scroll-margin-top:72px}
     <h3>Inscrição no 5KM</h3>
     <p class="sub">Gratuita e opcional para correr. Ela coloca você nos <strong style="color:var(--accent)">sorteios da campanha</strong>. Não inclui o ingresso da festa.</p>
     <form id="form-insc">
+      <input id="i-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       <label for="i-nome">Seu nome</label>
       <input id="i-nome" name="nome" required maxlength="120" autocomplete="name">
       <label for="i-zap">WhatsApp</label>
@@ -634,6 +635,7 @@ section[id]{scroll-margin-top:72px}
     <h3>Patrocine o evento</h3>
     <p class="sub">Preencha e receba na hora o deck com formatos e contrapartidas.</p>
     <form id="form-pat">
+      <input id="f-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       <label for="f-nome">Seu nome</label>
       <input id="f-nome" name="nome" required maxlength="120" autocomplete="name">
       <label for="f-tel">Telefone / WhatsApp</label>
@@ -821,19 +823,23 @@ var sticky=byId("stickybar"), ctaFinal=byId("cta-final");
 if(sticky && ctaFinal){ new IntersectionObserver(function(es){ sticky.classList.toggle("hide", es[0].isIntersecting); },{threshold:.2}).observe(ctaFinal); }
 
 /* formulários Supabase */
-function sbForm(formId, sendId, errId, modal, rpc, bodyFn, sendLabel){
-  byId(formId).addEventListener("submit", function(e){
+function sbForm(formId, sendId, errId, modal, kind, bodyFn, sendLabel){
+  var t0=0, f=byId(formId);
+  f.addEventListener("focusin", function(){ if(!t0) t0=Date.now(); });
+  f.addEventListener("submit", function(e){
     e.preventDefault();
     var send=byId(sendId), err=byId(errId);
     err.style.display="none"; send.disabled=true; send.textContent="Enviando…";
-    fetch(SB_URL+"/rest/v1/rpc/"+rpc, {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(bodyFn())})
-      .then(function(r){ if(!r.ok) throw 0; modal.classList.add("done"); })
+    var body=bodyFn(); body.kind=kind; body.ff = t0 ? (Date.now()-t0) : 9999;
+    fetch(SB_URL+"/functions/v1/submit-lead", {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ if(!d || !d.ok) throw 0; modal.classList.add("done"); })
       .catch(function(){ err.style.display="block"; })
       .finally(function(){ send.disabled=false; send.textContent=sendLabel; });
   });
 }
-sbForm("form-insc","i-send","i-err",mi,"add_inscricao",function(){ return {p_nome:byId("i-nome").value,p_whatsapp:byId("i-zap").value,p_email:byId("i-mail").value,p_termo:byId("i-termo").checked}; },"Confirmar inscrição gratuita");
-sbForm("form-pat","f-send","f-err",mp,"add_lead",function(){ return {p_nome:byId("f-nome").value,p_telefone:byId("f-tel").value,p_empresa:byId("f-emp").value}; },"Enviar e acessar o deck");
+sbForm("form-insc","i-send","i-err",mi,"inscricao",function(){ return {nome:byId("i-nome").value,whatsapp:byId("i-zap").value,email:byId("i-mail").value,termo:byId("i-termo").checked,website:byId("i-hp").value}; },"Confirmar inscrição gratuita");
+sbForm("form-pat","f-send","f-err",mp,"sponsor",function(){ return {nome:byId("f-nome").value,telefone:byId("f-tel").value,empresa:byId("f-emp").value,website:byId("f-hp").value}; },"Enviar e acessar o deck");
 
 /* fundo fluido */
 function fluid(id){
