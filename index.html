@@ -234,6 +234,8 @@ section[id]{scroll-margin-top:72px}
   background:var(--accent-dim);border-radius:6px;padding:4px 8px;flex:none}
 .festa .aviso{margin-top:14px;font-size:.82rem;color:var(--muted)}
 .festa .aviso b{color:var(--text)}
+/* Some quando o 1º lote abre (JS põe .lote-aberto no body) */
+.lote-aberto .pre-lote{display:none!important}
 .vip-note{display:flex;gap:12px;align-items:flex-start;margin-top:18px;background:var(--accent-dim);
   border:1px solid rgba(77,141,255,.35);border-radius:12px;padding:14px 18px;font-size:.9rem;color:var(--text)}
 .vip-note strong{color:var(--accent)}
@@ -381,7 +383,7 @@ section[id]{scroll-margin-top:72px}
       <div class="card2 paid">
         <div class="k">Momento 2 · à noite</div>
         <h3>Festa com ingresso</h3>
-        <div class="price-tag">1º lote: quinta, 19h · no grupo VIP</div>
+        <div class="price-tag pre-lote">1º lote: quinta, 19h · no grupo VIP</div>
         <p>Depois do corre, o Seu Jorge Boteco recebe a comemoração de 1 ano da Running Gang, com três atrações no palco. Você pode ir somente à festa. Não é necessário participar do 5KM.</p>
         <ul>
           <li>Festa com ingresso pago</li>
@@ -390,7 +392,7 @@ section[id]{scroll-margin-top:72px}
           <li class="no">Ingresso vendido separadamente do 5KM</li>
         </ul>
         <button class="btn js-buy" type="button">Entrar no grupo VIP</button>
-        <div class="note">O 1º lote abre quinta, 19h, direto no grupo VIP. Não precisa correr pra ir à festa.</div>
+        <div class="note pre-lote">O 1º lote abre quinta, 19h, direto no grupo VIP. Não precisa correr pra ir à festa.</div>
       </div>
     </div>
   </div>
@@ -469,7 +471,7 @@ section[id]{scroll-margin-top:72px}
     </div>
     <div class="festa rv">
       <div class="k eyebrow" style="margin-bottom:4px">Gang Corre Party · Festa</div>
-      <div class="price">VALOR SURPRESA<small>1º lote e todos os valores lançam quinta, 19h, no grupo VIP</small></div>
+      <div class="price" id="festa-price">VALOR SURPRESA<small>1º lote e todos os valores lançam quinta, 19h, no grupo VIP</small></div>
       <div class="facts">
         <span><strong>29/08</strong> · sábado</span>
         <span><strong>21h</strong> · início da festa</span>
@@ -481,7 +483,7 @@ section[id]{scroll-margin-top:72px}
         <div class="slot"><span class="ord">2ª atração</span> Arags</div>
         <div class="slot"><span class="ord">3ª atração</span> Louis Avilla</div>
       </div>
-      <div class="vip-note">
+      <div class="vip-note pre-lote">
         <span class="vip-dot"></span>
         <div><strong>As vendas ainda não abriram.</strong> O 1º lote (promocional) e os valores de todos os lotes lançam <strong>quinta-feira, às 19h, direto no grupo VIP.</strong> Entra agora pra receber o link em primeira mão.</div>
       </div>
@@ -661,7 +663,12 @@ var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var GRUPO_VIP_URL = "https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6";
 /* Link de pagamento da InfinitePay. VAZIO = botão abre o grupo VIP (como agora).
    Quando o lote abrir, cole aqui o link e todos os botões viram compra direta. */
-var CHECKOUT_URL = "";
+var CHECKOUT_URL = "https://checkout.infinitepay.io/nathalialouise?lenc=G-sAAOT_Tn0FLsiBZIKWKnRrJv8yQTq1AmuL93me3jxQKwyCtrB5LcsyCfSgB_1BN1aCGJw_xoO2-dWMu3-47oa35jEpAvQyiS1UcBJ6vmraGxosNVTlkdQPq4sfOjtS7f98fwe4TNmy1q3sOsjN5wLaVmagI0EFoFmAOrdQ03BSUr5sJEfB0D_aHQ94aMNUPo-K55gc2lYK-5qEmI6y5TKkNMYMWGs1FWA3.v1.b997a465fc145205";
+/* Quando o 1º lote abre. Antes disso o botão abre o grupo VIP; a partir daqui
+   (E com CHECKOUT_URL preenchido) todos os botões viram compra direta, sozinho. */
+var LOTE_ABRE = "2026-07-23T19:00:00-03:00";
+/* Preço mostrado no lugar de "VALOR SURPRESA" depois que abre. Ex: "R$ 65". Vazio = mantém texto. */
+var PRECO_LOTE = "R$ 50";
 var DATA_EVENTO   = "2026-08-29T20:00:00-03:00";
 var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
 var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
@@ -669,12 +676,32 @@ var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
 
 var byId = function(id){ return document.getElementById(id); };
 
-/* ---- CTA da festa -> abre modal do grupo VIP (ingresso sai quinta, 19h) ---- */
+/* ---- CTA da festa: antes de quinta 19h abre o grupo VIP; depois vira compra ---- */
 var mv = byId("modal-vip");
+/* Só vira compra se JÁ passou de LOTE_ABRE E existe link. Sem link = fica no grupo (à prova de erro). */
+function loteAberto(){ return !!CHECKOUT_URL && Date.now() >= new Date(LOTE_ABRE).getTime(); }
 document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", function(){
-  if(CHECKOUT_URL){ window.open(CHECKOUT_URL, "_blank", "noopener"); }
+  if(loteAberto()){ window.open(CHECKOUT_URL, "_blank", "noopener"); }
   else { mv.classList.add("on"); }
 }); });
+/* Aplica o estado visual (rótulo dos botões, preço, avisos) conforme o lote esteja aberto ou não. */
+function aplicarEstadoLote(){
+  var aberto = loteAberto();
+  document.body.classList.toggle("lote-aberto", aberto);
+  if(aberto){
+    document.querySelectorAll(".js-buy").forEach(function(b){ b.textContent = "🔥 Comprar ingresso"; });
+    if(PRECO_LOTE){
+      var pe = byId("festa-price");
+      if(pe){ pe.innerHTML = PRECO_LOTE + '<small>1º lote promocional · vendas abertas</small>'; }
+    }
+  }
+}
+aplicarEstadoLote();
+/* Se alguém estiver na página quando dá 19h, vira sozinho sem recarregar. */
+(function(){
+  var faltam = new Date(LOTE_ABRE).getTime() - Date.now();
+  if(faltam > 0 && faltam < 864e5){ setTimeout(aplicarEstadoLote, faltam + 500); }
+})();
 mv.querySelectorAll("[data-close-vip]").forEach(function(b){ b.addEventListener("click", function(){ mv.classList.remove("on"); }); });
 var vipLink = document.querySelector(".js-vip-link");
 if(vipLink){

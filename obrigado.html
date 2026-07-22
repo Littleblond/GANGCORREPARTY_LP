@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ingresso confirmado · Gang Corre Party</title>
+<style>
+  :root{--bg:#0a0c10;--surface:#12151c;--surface-2:#171b24;--line:#242a36;--text:#f4f6fa;--muted:#8b93a3;--accent:#4D8DFF}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;line-height:1.5}
+  .box{width:min(460px,100%);background:var(--surface-2);border:1px solid var(--line);border-radius:18px;
+    padding:40px 30px;text-align:center}
+  .check{width:64px;height:64px;border-radius:50%;background:rgba(77,141,255,.15);border:1px solid var(--accent);
+    display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 22px}
+  h1{font-size:1.7rem;text-transform:uppercase;letter-spacing:.01em;margin-bottom:10px}
+  .sub{color:var(--muted);font-size:.95rem;margin-bottom:26px}
+  .sub b{color:var(--text)}
+  .btn{display:block;width:100%;background:var(--accent);color:#04122e;font-weight:800;font-size:1.05rem;
+    text-decoration:none;padding:16px;border-radius:12px;text-transform:uppercase;letter-spacing:.02em;transition:filter .2s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600;
+    font-size:.85rem;text-transform:none;margin-top:12px;padding:12px}
+  .step{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+    text-align:left;font-size:.9rem;color:var(--muted);margin-bottom:22px}
+  .step b{color:var(--text)}
+  .foot{margin-top:24px;font-size:.75rem;color:var(--muted)}
+</style>
+</head>
+<body>
+  <main class="box">
+    <div class="check">✓</div>
+    <h1>Ingresso confirmado</h1>
+    <p class="sub">Seu pagamento foi aprovado. Bem-vindo à <b>Gang Corre Party</b> — 29/08, Seu Jorge Boteco.</p>
+    <div class="step">
+      <b>Último passo:</b> entre no grupo VIP dos ingressos. É onde a produção manda tudo — line-up, horários, avisos e sua confirmação de entrada na festa.
+    </div>
+    <a class="btn" id="grupo" href="https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6" target="_blank" rel="noopener">🔥 Entrar no grupo VIP</a>
+    <a class="btn ghost" id="recibo" href="#" target="_blank" rel="noopener" style="display:none">Ver comprovante do pagamento</a>
+    <div class="foot">Guarde este ingresso. Dúvidas? Fale com quem te enviou o link ou no grupo VIP.</div>
+  </main>
+<script>
+  // A InfinitePay redireciona pra cá com ?receipt_url=...&order_nsu=...&transaction_nsu=...
+  (function(){
+    var q = new URLSearchParams(location.search);
+    var r = q.get("receipt_url");
+    if(r){ var el=document.getElementById("recibo"); el.href=r; el.style.display="block"; }
+  })();
+</script>
+</body>
+</html>
