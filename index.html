@@ -659,6 +659,9 @@ var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* Link do grupo VIP (WhatsApp/Telegram). É pra onde vai o botão "Entrar no grupo VIP".
    Enquanto vazio, o botão do modal só mostra o aviso. Cole o link do grupo aqui. */
 var GRUPO_VIP_URL = "https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6";
+/* Link de pagamento da InfinitePay. VAZIO = botão abre o grupo VIP (como agora).
+   Quando o lote abrir, cole aqui o link e todos os botões viram compra direta. */
+var CHECKOUT_URL = "";
 var DATA_EVENTO   = "2026-08-29T20:00:00-03:00";
 var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
 var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
@@ -668,7 +671,10 @@ var byId = function(id){ return document.getElementById(id); };
 
 /* ---- CTA da festa -> abre modal do grupo VIP (ingresso sai quinta, 19h) ---- */
 var mv = byId("modal-vip");
-document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", function(){ mv.classList.add("on"); }); });
+document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", function(){
+  if(CHECKOUT_URL){ window.open(CHECKOUT_URL, "_blank", "noopener"); }
+  else { mv.classList.add("on"); }
+}); });
 mv.querySelectorAll("[data-close-vip]").forEach(function(b){ b.addEventListener("click", function(){ mv.classList.remove("on"); }); });
 var vipLink = document.querySelector(".js-vip-link");
 if(vipLink){
