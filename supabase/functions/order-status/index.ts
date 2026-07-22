@@ -56,13 +56,24 @@ Deno.serve(async (req) => {
   const db = createClient(SB_URL, SB_SR, { auth: { persistSession: false } });
   const { data: order } = await db
     .from("gcp_orders")
-    .select("status, expected_amount, paid_amount, payment_method, receipt_url")
+    .select("id, status, expected_amount, paid_amount, payment_method, receipt_url")
     .eq("order_nsu", order_nsu)
     .eq("public_token", token)
     .maybeSingle();
 
   // token errado ou pedido inexistente -> mesma resposta genérica (anti-enumeração)
   if (!order) return json({ error: "not_found" }, 404, cors);
+
+  // Ingressos: só devolve os códigos quando o pedido está pago (o QR sai daqui).
+  let tickets: { code: string; status: string }[] = [];
+  if (order.status === "paid") {
+    const { data: t } = await db
+      .from("gcp_tickets")
+      .select("code, status")
+      .eq("order_id", order.id)
+      .order("created_at", { ascending: true });
+    tickets = t ?? [];
+  }
 
   return json({
     status: order.status,
@@ -71,5 +82,6 @@ Deno.serve(async (req) => {
     paid_amount: order.paid_amount,
     method: order.payment_method,
     receipt_url: order.status === "paid" ? order.receipt_url : null,
+    tickets,
   }, 200, cors);
 });
