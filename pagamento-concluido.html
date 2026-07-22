@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pagamento · Gang Corre Party</title>
+<style>
+  :root{--bg:#0a0c10;--surface:#12151c;--surface-2:#171b24;--line:#242a36;--text:#f4f6fa;--muted:#8b93a3;--accent:#4D8DFF;--ok:#38d39f;--err:#E8622C}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;line-height:1.5}
+  .box{width:min(460px,100%);background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:40px 30px;text-align:center}
+  .dot{width:64px;height:64px;border-radius:50%;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;font-size:30px;
+    background:rgba(77,141,255,.14);border:1px solid var(--accent)}
+  .dot.ok{background:rgba(56,211,159,.14);border-color:var(--ok)}
+  .dot.err{background:rgba(232,98,44,.14);border-color:var(--err)}
+  .spin{width:34px;height:34px;border:3px solid rgba(255,255,255,.18);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+  h1{font-size:1.6rem;text-transform:uppercase;margin-bottom:10px}
+  .sub{color:var(--muted);font-size:.95rem;margin-bottom:26px}
+  .sub b{color:var(--text)}
+  .btn{display:block;width:100%;background:var(--accent);color:#04122e;font-weight:800;font-size:1.05rem;text-decoration:none;
+    padding:16px;border-radius:12px;text-transform:uppercase;letter-spacing:.02em;transition:filter .2s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600;font-size:.85rem;text-transform:none;margin-top:12px;padding:12px}
+  .foot{margin-top:24px;font-size:.75rem;color:var(--muted)}
+  .hide{display:none}
+</style>
+</head>
+<body>
+  <main class="box">
+    <div id="ic" class="dot"><div class="spin"></div></div>
+    <h1 id="ttl">Confirmando pagamento</h1>
+    <p class="sub" id="msg">Só um instante — estamos confirmando seu pagamento com o banco. Não feche esta página.</p>
+    <a class="btn hide" id="grupo" href="#" target="_blank" rel="noopener">🔥 Entrar no grupo VIP</a>
+    <a class="btn ghost hide" id="recibo" href="#" target="_blank" rel="noopener">Ver comprovante</a>
+    <button class="btn ghost hide" id="retry" type="button">Verificar de novo</button>
+    <div class="foot">Dúvidas? Fale com quem te enviou o link.</div>
+  </main>
+<script>
+  "use strict";
+  // Config pública (sem segredo): endpoint do backend + chave publishable.
+  var FN  = "https://asppjvxeqpfsonknukla.supabase.co/functions/v1";
+  var KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
+  var GRUPO = "https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6";
+
+  var q = new URLSearchParams(location.search);
+  var order = q.get("order") || "";
+  var token = q.get("t") || "";
+  var receipt = q.get("receipt_url") || "";
+
+  var ic = document.getElementById("ic"), ttl = document.getElementById("ttl"), msg = document.getElementById("msg");
+  var bGrupo = document.getElementById("grupo"), bRecibo = document.getElementById("recibo"), bRetry = document.getElementById("retry");
+
+  var tries = 0, MAX = 6;
+
+  function paid(receiptUrl){
+    ic.className = "dot ok"; ic.textContent = "✓";
+    ttl.textContent = "Pagamento confirmado";
+    msg.innerHTML = "Ingresso garantido! Bem-vindo à <b>Gang Corre Party</b>. Entre no grupo VIP pra receber line-up, horários e sua confirmação de entrada.";
+    bGrupo.href = GRUPO; bGrupo.classList.remove("hide");
+    var r = receiptUrl || receipt;
+    if(r){ bRecibo.href = r; bRecibo.classList.remove("hide"); }
+    bRetry.classList.add("hide");
+  }
+  function pending(){
+    ttl.textContent = "Pagamento em processamento";
+    msg.innerHTML = "Recebemos, mas o banco ainda não confirmou. Isso pode levar alguns instantes (especialmente no cartão).";
+    bRetry.classList.remove("hide");
+  }
+  function problem(){
+    ic.className = "dot err"; ic.textContent = "!";
+    ttl.textContent = "Não conseguimos confirmar";
+    msg.innerHTML = "Se você pagou, não se preocupe: seu ingresso é validado pelo pagamento. Fale com quem te enviou o link e guarde seu comprovante.";
+    bRetry.classList.remove("hide");
+  }
+
+  async function check(){
+    tries++;
+    try{
+      var r = await fetch(FN + "/order-status?order=" + encodeURIComponent(order) + "&t=" + encodeURIComponent(token), {
+        headers: { "apikey": KEY, "Authorization": "Bearer " + KEY }
+      });
+      var d = await r.json().catch(function(){ return {}; });
+      if(r.ok && d.paid){ paid(d.receipt_url); return; }
+      if(r.ok && (d.status === "pending" || d.status === "payment_link_created" || d.status === "processing")){
+        if(tries < MAX){ ic.innerHTML = '<div class="spin"></div>'; setTimeout(check, 3000); }
+        else { pending(); }
+        return;
+      }
+      // status failed/expired/cancelled ou 404
+      if(tries < MAX){ setTimeout(check, 3000); } else { problem(); }
+    }catch(_e){
+      if(tries < MAX){ setTimeout(check, 3000); } else { problem(); }
+    }
+  }
+
+  bRetry.addEventListener("click", function(){
+    tries = 0; ic.className = "dot"; ic.innerHTML = '<div class="spin"></div>';
+    ttl.textContent = "Confirmando pagamento"; msg.textContent = "Verificando…";
+    bRetry.classList.add("hide"); check();
+  });
+
+  if(!order || !token){ problem(); } else { check(); }
+</script>
+</body>
+</html>
