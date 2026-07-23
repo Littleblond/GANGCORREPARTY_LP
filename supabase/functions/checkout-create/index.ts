@@ -62,8 +62,9 @@ Deno.serve(async (req) => {
   const name  = clean(body?.customer?.name, 120);
   const email = clean(body?.customer?.email, 160).toLowerCase();
   const phone = clean(body?.customer?.phone, 40).replace(/[^\d+]/g, "");
+  const cpf   = clean(body?.customer?.cpf, 20).replace(/[^\d]/g, "");
   if (name.length < 2) return json({ error: "invalid_name" }, 400, cors);
-  if (!isEmail(email)) return json({ error: "invalid_email" }, 400, cors);
+  if (email && !isEmail(email)) return json({ error: "invalid_email" }, 400, cors);
   if (phone.length < 8) return json({ error: "invalid_phone" }, 400, cors);
 
   const lotId = body?.lot_id ? clean(body.lot_id, 60) : null;
@@ -89,7 +90,7 @@ Deno.serve(async (req) => {
   const public_token = crypto.randomUUID();
   const { data: order, error: insErr } = await db.from("gcp_orders").insert({
     order_nsu, public_token,
-    customer_name: name, customer_email: email, customer_phone: phone,
+    customer_name: name, customer_email: email || null, customer_phone: phone, customer_cpf: cpf || null,
     status: "pending", expected_amount: expected,
   }).select("id").single();
   if (insErr || !order) return json({ error: "server_error" }, 500, cors);

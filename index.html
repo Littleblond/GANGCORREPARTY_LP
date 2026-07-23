@@ -678,12 +678,44 @@ var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
 
 var byId = function(id){ return document.getElementById(id); };
 
+/* ---- Compra: coleta nome/whatsapp/cpf, cria pedido no backend (comprador vai pro CRM),
+   e manda pro checkout InfinitePay. Se o backend falhar, cai no link estatico (venda nunca quebra). ---- */
+var buyEl;
+function openBuy(){
+  if(!buyEl){
+    buyEl = document.createElement("div");
+    buyEl.className = "modal";
+    buyEl.innerHTML = '<div class="back" data-bclose></div><div class="box"><button class="x" type="button" data-bclose>×</button>'
+      + '<h3>Garantir ingresso</h3><p class="sub">1º lote · R$ 50. Preenche que a gente registra e te leva pro pagamento.</p>'
+      + '<form id="buy-form"><label>Seu nome</label><input id="buy-nome" required maxlength="120" autocomplete="name">'
+      + '<label>WhatsApp</label><input id="buy-zap" required maxlength="40" inputmode="tel" autocomplete="tel">'
+      + '<label>CPF (opcional)</label><input id="buy-cpf" maxlength="20" inputmode="numeric" autocomplete="off">'
+      + '<button class="btn" type="submit" id="buy-send" style="margin-top:14px">Ir pro pagamento</button>'
+      + '<div class="err" id="buy-err" style="display:none;margin-top:10px">Não deu. Vamos direto pro pagamento…</div></form></div>';
+    document.body.appendChild(buyEl);
+    buyEl.querySelectorAll("[data-bclose]").forEach(function(x){ x.addEventListener("click", function(){ buyEl.classList.remove("on"); }); });
+    buyEl.querySelector("#buy-form").addEventListener("submit", doBuy);
+  }
+  buyEl.classList.add("on");
+}
+function doBuy(e){
+  e.preventDefault();
+  var send = byId("buy-send"), err = byId("buy-err");
+  err.style.display="none"; send.disabled=true; send.textContent="Aguarde…";
+  var body = { quantity:1, customer:{ name: byId("buy-nome").value, phone: byId("buy-zap").value, cpf: byId("buy-cpf").value } };
+  var fb = function(){ window.location.href = CHECKOUT_URL; }; /* fallback: link estatico */
+  fetch(SB_URL+"/functions/v1/checkout-create", {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if(d && d.checkout_url){ window.location.href = d.checkout_url; } else { throw 0; } })
+    .catch(function(){ fb(); });
+}
+
 /* ---- CTA da festa: antes de quinta 19h abre o grupo VIP; depois vira compra ---- */
 var mv = byId("modal-vip");
 /* Só vira compra se JÁ passou de LOTE_ABRE E existe link. Sem link = fica no grupo (à prova de erro). */
 function loteAberto(){ return !!CHECKOUT_URL && Date.now() >= new Date(LOTE_ABRE).getTime(); }
 document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", function(){
-  if(loteAberto()){ window.open(CHECKOUT_URL, "_blank", "noopener"); }
+  if(loteAberto()){ openBuy(); }
   else { mv.classList.add("on"); }
 }); });
 /* Aplica o estado visual (rótulo dos botões, preço, avisos) conforme o lote esteja aberto ou não. */
