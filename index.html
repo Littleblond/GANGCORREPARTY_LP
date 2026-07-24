@@ -551,6 +551,16 @@ section[id]{scroll-margin-top:72px}
   </div>
 </footer>
 
+<!-- GRUPO VIP WHATSAPP -->
+<section id="grupo-vip" style="padding:48px 20px;display:flex;justify-content:center">
+  <div style="max-width:520px;width:100%;text-align:center;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.35);border-radius:20px;padding:28px 22px">
+    <div style="font-size:2rem;margin-bottom:8px">📲</div>
+    <h3 style="margin:0 0 8px;font-weight:900;text-transform:uppercase;letter-spacing:.02em">Quer saber de tudo primeiro?</h3>
+    <p style="margin:0 auto 18px;max-width:40ch;opacity:.75;font-size:.95rem">Entra no grupo do WhatsApp e recebe informações exclusivas e em primeira mão do evento: sorteios, atrações e avisos antes de todo mundo.</p>
+    <a href="https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#0b1a10;font-weight:800;padding:14px 26px;border-radius:999px;text-decoration:none;font-size:1rem">💬 Entrar no grupo do WhatsApp</a>
+  </div>
+</section>
+
 <!-- 15. RODAPÉ -->
 <div class="foot">
   Gang Corre Party · 29/08 · Seu Jorge Boteco, Umuarama-PR<br>
@@ -601,6 +611,8 @@ section[id]{scroll-margin-top:72px}
       <input id="i-zap" name="whatsapp" required maxlength="40" inputmode="tel" autocomplete="tel">
       <label for="i-mail">E-mail</label>
       <input id="i-mail" name="email" type="email" required maxlength="160" autocomplete="email">
+      <label for="i-nasc">Data de nascimento</label>
+      <input id="i-nasc" name="nascimento" type="date" required autocomplete="bday" min="1926-01-01" max="2021-12-31">
       <div class="termo">
         <details>
           <summary>Ler o termo de participação</summary>
@@ -870,7 +882,7 @@ function sbForm(formId, sendId, errId, modal, kind, bodyFn, sendLabel){
       .finally(function(){ send.disabled=false; send.textContent=sendLabel; });
   });
 }
-sbForm("form-insc","i-send","i-err",mi,"inscricao",function(){ return {nome:byId("i-nome").value,whatsapp:byId("i-zap").value,email:byId("i-mail").value,termo:byId("i-termo").checked,website:byId("i-hp").value}; },"Confirmar inscrição gratuita");
+sbForm("form-insc","i-send","i-err",mi,"inscricao",function(){ return {nome:byId("i-nome").value,whatsapp:byId("i-zap").value,email:byId("i-mail").value,nascimento:byId("i-nasc").value,termo:byId("i-termo").checked,website:byId("i-hp").value}; },"Confirmar inscrição gratuita");
 sbForm("form-pat","f-send","f-err",mp,"sponsor",function(){ return {nome:byId("f-nome").value,telefone:byId("f-tel").value,empresa:byId("f-emp").value,website:byId("f-hp").value}; },"Enviar e acessar o deck");
 
 /* fundo fluido */
