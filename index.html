@@ -509,8 +509,7 @@ section[id]{scroll-margin-top:72px}
 .lu-head{text-align:center;z-index:2}
 .lu-head .eyebrow{margin-bottom:6px}
 .lu-sub{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-.book-wrap{position:relative;perspective:2200px;cursor:grab;-webkit-user-select:none;user-select:none;touch-action:pan-y}
-.book-wrap:active{cursor:grabbing}
+.book-wrap{position:relative;perspective:2200px}
 .book{--bh:min(70dvh,540px);--bw:calc(var(--bh) * .72);position:relative;
   width:calc(var(--bw) * 2);height:var(--bh);transform-style:preserve-3d}
 .book.is-mobile{--bw:min(84vw,380px);--bh:min(calc(84vw / .70),66dvh);width:var(--bw)}
@@ -624,7 +623,7 @@ section[id]{scroll-margin-top:72px}
         <div class="lu-progress" id="lu-prog" aria-live="polite">Capa</div>
         <button class="lu-nav" id="lu-next" type="button" aria-label="Próxima página">&#8250;</button>
       </div>
-      <div class="lu-hint" id="lu-hint">arraste, use as setas ou o teclado</div>
+      <div class="lu-hint" id="lu-hint">use os botões para virar</div>
     </div>
   </div>
 </section>
@@ -709,7 +708,7 @@ section[id]{scroll-margin-top:72px}
     {r:3,m:"02 · foto"},{r:4,m:"02 / 03"},{r:5,m:"03 · foto"},
     {r:6,m:"03 / 03"},{r:7,m:"Fim"}
   ];
-  var views=viewsDesk, idx=0, animating=false;
+  var views=viewsDesk, idx=0, animating=false, pending=0;
 
   function applyLayout(){
     var mobile=mq.matches;
@@ -729,7 +728,14 @@ section[id]{scroll-margin-top:72px}
     prog.textContent=v.m;
     btnPrev.disabled=(i<=0); btnNext.disabled=(i>=views.length-1);
   }
-  function finalize(to){ leaf.className="leaf"; animating=false; renderView(to); }
+  function finalize(to){
+    leaf.className="leaf"; animating=false; renderView(to);
+    if(pending!==0){                                   // encadeia as viradas em fila (fluidez)
+      var d=pending>0?1:-1; pending-=d;
+      if(idx+d>=0 && idx+d<views.length){ hideHint(); flip(d); }
+      else pending=0;                                  // chegou no limite: descarta o resto
+    }
+  }
 
   function flip(dir){
     var from=idx, to=idx+dir;
@@ -766,7 +772,10 @@ section[id]{scroll-margin-top:72px}
   // ---- controle manual (livro desacoplado do scroll) ----
   var opened=false, inView=false;
   function hideHint(){ if(hint) hint.classList.add("gone"); }
-  function go(dir){ if(animating) return; hideHint(); return flip(dir); }
+  function go(dir){
+    if(animating){ pending+=dir; return; }   // acumula as viradas; rodam ao fim da atual
+    hideHint(); return flip(dir);
+  }
 
   btnPrev.addEventListener("click",function(){ go(-1); });
   btnNext.addEventListener("click",function(){ go(1); });
@@ -777,32 +786,6 @@ section[id]{scroll-margin-top:72px}
     if(e.key==="ArrowRight"){ e.preventDefault(); go(1); }
     else if(e.key==="ArrowLeft"){ e.preventDefault(); go(-1); }
   });
-
-  // arraste (mouse) + swipe (touch) HORIZONTAL só no livro.
-  // Gesto vertical é solto pro navegador rolar a página normalmente.
-  var wrap=track.querySelector(".book-wrap");
-  var sx=0, sy=0, sdrag=false, sid=null, decided=false, isH=false;
-  wrap.addEventListener("pointerdown",function(e){
-    if(e.pointerType==="mouse" && e.button!==0) return;
-    sx=e.clientX; sy=e.clientY; sdrag=true; sid=e.pointerId; decided=false; isH=false;
-  });
-  wrap.addEventListener("pointermove",function(e){
-    if(!sdrag || e.pointerId!==sid || decided) return;
-    var dx=e.clientX-sx, dy=e.clientY-sy;
-    if(Math.abs(dx)>10 || Math.abs(dy)>10){
-      decided=true; isH=Math.abs(dx)>Math.abs(dy);
-      if(isH){ try{wrap.setPointerCapture(sid);}catch(_){} }
-      else { sdrag=false; }   // rolagem vertical: entrega pro navegador
-    }
-  });
-  wrap.addEventListener("pointerup",function(e){
-    if(!sdrag || e.pointerId!==sid) return;
-    sdrag=false;
-    if(!isH) return;
-    var dx=e.clientX-sx;
-    if(Math.abs(dx)>44) go(dx<0?1:-1);
-  });
-  wrap.addEventListener("pointercancel",function(){ sdrag=false; });
 
   // abre a capa sozinho ao entrar na seção; da 1ª folha em diante é manual
   var io=new IntersectionObserver(function(entries){
