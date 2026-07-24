@@ -54,9 +54,12 @@ p{max-width:64ch}
 .lead{font-size:1.12rem;color:var(--muted)}
 .sub{color:var(--muted)}
 
-.rv{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
-.rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+/* fail-safe: sem JS (ou se o script falhar) o texto fica SEMPRE visível.
+   só esconde/anima quando o JS confirma com a classe .js-reveal no <html> */
+.rv{transition:opacity .7s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
+html.js-reveal .rv{opacity:0;transform:translateY(28px)}
+html.js-reveal .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){html.js-reveal .rv{opacity:1;transform:none;transition:none}}
 
 /* botões */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--mono);font-size:.8rem;font-weight:700;
@@ -525,7 +528,7 @@ section[id]{scroll-margin-top:72px}
 .book.is-mobile .page-left{display:none}
 .book.is-mobile .page-right{left:0;width:100%;border-radius:6px}
 .leaf{position:absolute;top:0;left:50%;width:50%;height:100%;transform-style:preserve-3d;z-index:5;display:none;
-  transition:transform .82s cubic-bezier(.42,.13,.2,1)}
+  transition:transform .8s cubic-bezier(.25,.72,.3,1);will-change:transform}
 .book.is-mobile .leaf{width:100%;left:0}
 .leaf.fwd{transform-origin:left center}
 .leaf.bwd{transform-origin:right center}
@@ -535,10 +538,17 @@ section[id]{scroll-margin-top:72px}
 .leaf-face{position:absolute;inset:0;overflow:hidden;background:var(--paper);color:var(--ink2);
   -webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:2px 6px 6px 2px}
 .leaf-back{transform:rotateY(180deg);border-radius:6px 2px 2px 6px}
+/* sombra que varre a folha: bordas escuras + brilho no centro = papel abaulado (folha mole) */
 .leaf-shade{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;
-  background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,0) 42%,rgba(0,0,0,0) 58%,rgba(0,0,0,.3))}
-.leaf.turning .leaf-shade{animation:luShade .82s ease}
-@keyframes luShade{0%{opacity:0}48%{opacity:1}100%{opacity:0}}
+  background:linear-gradient(90deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.12) 20%,rgba(255,255,255,.14) 50%,rgba(0,0,0,.12) 80%,rgba(0,0,0,.5) 100%)}
+.leaf.turning .leaf-shade{animation:luShade .8s ease}
+@keyframes luShade{0%{opacity:0}18%{opacity:.9}50%{opacity:1}82%{opacity:.9}100%{opacity:0}}
+/* mobile: folha encadernada — lombada à esquerda, cantos externos arredondados (nao parece cartao solto) */
+.book.is-mobile .book-spine{display:block;left:0;width:15px;transform:none;z-index:7;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.14) 55%,rgba(0,0,0,0))}
+.book.is-mobile .page-right{border-radius:3px 10px 10px 3px}
+.book.is-mobile .leaf-face{border-radius:3px 10px 10px 3px}
+.book.is-mobile .leaf-back{border-radius:10px 3px 3px 10px}
 /* textura de papel */
 .pg{position:absolute;inset:0;overflow:hidden}
 .pg::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
@@ -829,7 +839,7 @@ section[id]{scroll-margin-top:72px}
   applyLayout();
 
   /* ---- botão de like ao vivo (line-up) — chamado após SB_URL/SB_KEY existirem ---- */
-  window.initLuLike=function(){
+  window.initLuLike=function(SB_URL, SB_KEY){
     var btn=document.getElementById("lu-like-btn"), cnt=document.getElementById("lu-count");
     if(!btn||!cnt||!SB_URL||!SB_KEY) return;
     var current=0, cooldown=false;
@@ -1064,8 +1074,9 @@ var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
 var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
 /* =============================== */
 
-/* liga o botão de like do line-up (precisa do SB_URL/SB_KEY acima) */
-if(window.initLuLike) window.initLuLike();
+/* liga o botão de like do line-up (precisa do SB_URL/SB_KEY acima).
+   try/catch: se o like falhar, NÃO pode derrubar botões/texto/formulários. */
+try{ if(window.initLuLike) window.initLuLike(SB_URL, SB_KEY); }catch(e){ console.warn("like:", e); }
 
 var byId = function(id){ return document.getElementById(id); };
 
@@ -1233,9 +1244,15 @@ stage.addEventListener("touchstart", function(e){ sx=e.touches[0].clientX; }, {p
 stage.addEventListener("touchend", function(e){ if(sx===null) return; var dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>40) show(cur.ev,cur.k+(dx<0?1:-1)); }, {passive:true});
 stage.addEventListener("click", function(e){ if(e.target===stage) lbClose(); });
 
-/* reveal */
+/* reveal (fail-safe) */
+document.documentElement.classList.add("js-reveal");
+var rvEls=document.querySelectorAll(".rv");
 var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }); },{threshold:.1});
-document.querySelectorAll(".rv").forEach(function(el){ io.observe(el); });
+rvEls.forEach(function(el){ io.observe(el); });
+/* rede de segurança: se por algum motivo o observer não disparar, revela tudo */
+setTimeout(function(){ rvEls.forEach(function(el){ el.classList.add("in"); }); }, 3500);
+window.addEventListener("load", function(){ requestAnimationFrame(function(){
+  rvEls.forEach(function(el){ var r=el.getBoundingClientRect(); if(r.top < innerHeight) el.classList.add("in"); }); }); });
 
 /* nav CTA aparece pós-hero */
 var nav=document.querySelector(".nav"), heroCta=byId("hero-cta");
