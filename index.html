@@ -512,43 +512,17 @@ section[id]{scroll-margin-top:72px}
 .lu-head{text-align:center;z-index:2}
 .lu-head .eyebrow{margin-bottom:6px}
 .lu-sub{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-.book-wrap{position:relative;perspective:2200px}
-.book{--bh:min(70dvh,540px);--bw:calc(var(--bh) * .72);position:relative;
-  width:calc(var(--bw) * 2);height:var(--bh);transform-style:preserve-3d}
-.book.is-mobile{--bw:min(84vw,380px);--bh:min(calc(84vw / .70),66dvh);width:var(--bw)}
-.book-spine{position:absolute;top:0;left:50%;transform:translateX(-50%);width:26px;height:100%;z-index:6;pointer-events:none;
-  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.42),rgba(0,0,0,0))}
-.book.is-mobile .book-spine{display:none}
-.book-shadow{position:absolute;left:50%;bottom:-5%;transform:translateX(-50%);width:88%;height:44px;
-  background:radial-gradient(ellipse at center,rgba(0,0,0,.6),rgba(0,0,0,0) 70%);filter:blur(6px);z-index:-1}
-.page{position:absolute;top:0;width:50%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink2);
-  box-shadow:inset 0 0 40px rgba(0,0,0,.18)}
-.page-left{left:0;border-radius:6px 2px 2px 6px}
-.page-right{left:50%;border-radius:2px 6px 6px 2px}
-.book.is-mobile .page-left{display:none}
-.book.is-mobile .page-right{left:0;width:100%;border-radius:6px}
-.leaf{position:absolute;top:0;left:50%;width:50%;height:100%;transform-style:preserve-3d;z-index:5;display:none;
-  transition:transform .8s cubic-bezier(.25,.72,.3,1);will-change:transform}
-.book.is-mobile .leaf{width:100%;left:0}
-.leaf.fwd{transform-origin:left center}
-.leaf.bwd{transform-origin:right center}
-.leaf.pre,.leaf.turning{display:block}
-.leaf.fwd.turning{transform:rotateY(-180deg)}
-.leaf.bwd.turning{transform:rotateY(180deg)}
-.leaf-face{position:absolute;inset:0;overflow:hidden;background:var(--paper);color:var(--ink2);
-  -webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:2px 6px 6px 2px}
-.leaf-back{transform:rotateY(180deg);border-radius:6px 2px 2px 6px}
-/* sombra que varre a folha: bordas escuras + brilho no centro = papel abaulado (folha mole) */
-.leaf-shade{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;
-  background:linear-gradient(90deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.12) 20%,rgba(255,255,255,.14) 50%,rgba(0,0,0,.12) 80%,rgba(0,0,0,.5) 100%)}
-.leaf.turning .leaf-shade{animation:luShade .8s ease}
-@keyframes luShade{0%{opacity:0}18%{opacity:.9}50%{opacity:1}82%{opacity:.9}100%{opacity:0}}
-/* mobile: folha encadernada — lombada à esquerda, cantos externos arredondados (nao parece cartao solto) */
-.book.is-mobile .book-spine{display:block;left:0;width:15px;transform:none;z-index:7;pointer-events:none;
-  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.14) 55%,rgba(0,0,0,0))}
-.book.is-mobile .page-right{border-radius:3px 10px 10px 3px}
-.book.is-mobile .leaf-face{border-radius:3px 10px 10px 3px}
-.book.is-mobile .leaf-back{border-radius:10px 3px 3px 10px}
+/* deck de slides: foto → texto → foto → texto (crossfade sutil, sem flip de pagina) */
+.lu-wrap{position:relative}
+.lu-deck{position:relative;--h:min(68dvh,560px);--w:min(86vw,calc(var(--h) * .72));
+  width:var(--w);height:var(--h);border-radius:10px;overflow:hidden;
+  background:var(--paper);color:var(--ink2);box-shadow:0 24px 60px rgba(0,0,0,.5);touch-action:pan-y}
+.lu-slide{position:absolute;inset:0;opacity:0;transform:translate3d(var(--dx,0px),0,0) scale(.985);
+  transition:opacity .52s ease,transform .52s cubic-bezier(.22,.72,.28,1);will-change:opacity,transform}
+.lu-slide.is-in{opacity:1;transform:translate3d(0,0,0) scale(1)}
+.lu-slide.is-out{opacity:0;transform:translate3d(var(--dx,0px),0,0) scale(1.012)}
+.lu-deck-shadow{position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);width:82%;height:38px;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.55),rgba(0,0,0,0) 70%);filter:blur(6px);z-index:-1}
 /* textura de papel */
 .pg{position:absolute;inset:0;overflow:hidden}
 .pg::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
@@ -592,7 +566,6 @@ section[id]{scroll-margin-top:72px}
 .pg-back{justify-content:center;align-items:flex-start;gap:14px;text-align:left}
 .back-title{font-family:var(--display);font-size:clamp(2.4rem,8vh,4.4rem);line-height:.84;text-transform:uppercase;margin:0}
 .back-brand{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.pg-spine{background:repeating-linear-gradient(90deg,#0a0b0f,#0a0b0f 2px,#15171d 2px,#15171d 4px)}
 /* controles */
 .lu-controls{display:flex;align-items:center;gap:16px;z-index:2}
 .lu-nav{width:44px;height:44px;border-radius:999px;border:1px solid var(--line);background:rgba(24,28,34,.8);
@@ -605,7 +578,7 @@ section[id]{scroll-margin-top:72px}
   transition:opacity .4s}
 .lu-hint.gone{opacity:0}
 @media (max-width:720px){.lu-sub{display:none}}
-@media (prefers-reduced-motion:reduce){.leaf{transition:none!important}.leaf.turning .leaf-shade{animation:none}}
+@media (prefers-reduced-motion:reduce){.lu-slide{transition:none!important;transform:none!important}}
 
 /* ---- botão de like (ao vivo) ---- */
 .lu-like{z-index:2;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2px}
@@ -633,25 +606,16 @@ section[id]{scroll-margin-top:72px}
         <div class="eyebrow">O line-up</div>
         <div class="lu-sub">Um álbum · três sets · uma pista</div>
       </div>
-      <div class="book-wrap">
-        <div class="book" id="lu-book">
-          <div class="page page-left" id="lu-left" aria-hidden="true"></div>
-          <div class="page page-right" id="lu-right"></div>
-          <div class="leaf" id="lu-leaf" aria-hidden="true">
-            <div class="leaf-face leaf-front" id="lu-front"></div>
-            <div class="leaf-face leaf-back" id="lu-back"></div>
-            <div class="leaf-shade"></div>
-          </div>
-          <div class="book-spine"></div>
-        </div>
-        <div class="book-shadow"></div>
+      <div class="lu-wrap">
+        <div class="lu-deck" id="lu-deck"></div>
+        <div class="lu-deck-shadow"></div>
       </div>
       <div class="lu-controls">
-        <button class="lu-nav" id="lu-prev" type="button" aria-label="Página anterior">&#8249;</button>
+        <button class="lu-nav" id="lu-prev" type="button" aria-label="Anterior">&#8249;</button>
         <div class="lu-progress" id="lu-prog" aria-live="polite">Capa</div>
-        <button class="lu-nav" id="lu-next" type="button" aria-label="Próxima página">&#8250;</button>
+        <button class="lu-nav" id="lu-next" type="button" aria-label="Próximo">&#8250;</button>
       </div>
-      <div class="lu-hint" id="lu-hint">use os botões para virar</div>
+      <div class="lu-hint" id="lu-hint">use os botões ou arraste</div>
       <div class="lu-like">
         <button class="lu-like-btn" id="lu-like-btn" type="button" aria-label="Curtir o line-up">
           <span class="lu-heart" id="lu-heart">&#10084;</span>
@@ -664,15 +628,11 @@ section[id]{scroll-margin-top:72px}
 </section>
 <script>
 (function(){
-  var book=document.getElementById("lu-book"); if(!book) return;
-  var track=document.getElementById("lu-track"),
-      pageL=document.getElementById("lu-left"), pageR=document.getElementById("lu-right"),
-      leaf=document.getElementById("lu-leaf"), leafF=document.getElementById("lu-front"),
-      leafB=document.getElementById("lu-back"), prog=document.getElementById("lu-prog"),
+  var deck=document.getElementById("lu-deck"); if(!deck) return;
+  var prog=document.getElementById("lu-prog"),
       btnPrev=document.getElementById("lu-prev"), btnNext=document.getElementById("lu-next"),
       hint=document.getElementById("lu-hint");
   var reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  var mq=matchMedia("(max-width:720px)");
 
   var ARTISTS=[
     {n:"01",name:"DanniDarkko",role:"Primeira atração",
@@ -723,97 +683,77 @@ section[id]{scroll-margin-top:72px}
     +'<div class="cover-bot">Um ano de Running Gang · três sets · uma pista</div></div>';
   var BACK='<div class="pg pg-back"><h3 class="back-title">Até o<br>último<br>beat.</h3>'
     +'<div class="cover-date sm">29.08</div><div class="back-brand">Gang Corre Party</div></div>';
-  var SPINE='<div class="pg pg-spine"></div>';
 
-  // faces: 0 cover, [1 photo,2 text]*3, 7 back, 8 spine
-  var faces=[COVER];
-  ARTISTS.forEach(function(a,i){ faces.push(facePhoto(a)); faces.push(faceText(a,i,ARTISTS.length)); });
-  faces.push(BACK); faces.push(SPINE);
-  var SP=faces.length-1, BK=SP-1;
+  // sequencia: capa · (foto, texto) por artista · fim
+  var faces=[COVER], views=[{f:0,m:"Capa"}], total=ARTISTS.length;
+  ARTISTS.forEach(function(a,i){
+    var n=("0"+(i+1)).slice(-2);
+    faces.push(facePhoto(a));        views.push({f:faces.length-1,m:n+" · foto"});
+    faces.push(faceText(a,i,total)); views.push({f:faces.length-1,m:n+" / 0"+total});
+  });
+  faces.push(BACK); views.push({f:faces.length-1,m:"Fim"});
 
-  var viewsDesk=[
-    {l:SP,r:0,m:"Capa"},
-    {l:1,r:2,m:"01 / 03"},
-    {l:3,r:4,m:"02 / 03"},
-    {l:5,r:6,m:"03 / 03"},
-    {l:BK,r:SP,m:"Fim"}
-  ];
-  var viewsMob=[
-    {r:0,m:"Capa"},{r:1,m:"01 · foto"},{r:2,m:"01 / 03"},
-    {r:3,m:"02 · foto"},{r:4,m:"02 / 03"},{r:5,m:"03 · foto"},
-    {r:6,m:"03 / 03"},{r:7,m:"Fim"}
-  ];
-  var views=viewsDesk, idx=0, animating=false, pending=0;
+  var idx=0, cur=null, SHIFT=16;
 
-  function applyLayout(){
-    var mobile=mq.matches;
-    book.classList.toggle("is-mobile", mobile);
-    var canonical=views[idx]?views[idx].r:0;
-    views=mobile?viewsMob:viewsDesk;
-    var best=0,bd=1e9;
-    for(var i=0;i<views.length;i++){var dd=Math.abs(views[i].r-canonical);if(dd<bd){bd=dd;best=i;}}
-    idx=best;
-    renderView(idx);
+  function makeSlide(html,dx){
+    var el=document.createElement("div");
+    el.className="lu-slide";
+    el.style.setProperty("--dx", dx+"px");
+    el.innerHTML=html;
+    return el;
   }
-  function renderView(i){
-    var v=views[i];
-    if(v.l!=null){pageL.style.display="";pageL.innerHTML=faces[v.l];}
-    else{pageL.style.display="none";pageL.innerHTML="";}
-    pageR.innerHTML=faces[v.r];
+  function show(i,dir){
+    var v=views[i]; if(!v) return false;
+    idx=i;
     prog.textContent=v.m;
     btnPrev.disabled=(i<=0); btnNext.disabled=(i>=views.length-1);
-  }
-  function finalize(to){
-    leaf.className="leaf"; animating=false; renderView(to);
-    if(pending!==0){                                   // encadeia as viradas em fila (fluidez)
-      var d=pending>0?1:-1; pending-=d;
-      if(idx+d>=0 && idx+d<views.length){ hideHint(); flip(d); }
-      else pending=0;                                  // chegou no limite: descarta o resto
+    var d = dir<0 ? -SHIFT : SHIFT;
+    var el=makeSlide(faces[v.f], d), old=cur;
+    while(deck.children.length>1 && deck.firstElementChild!==old) deck.removeChild(deck.firstElementChild);
+    deck.appendChild(el); cur=el;
+    if(reduced){
+      el.classList.add("is-in");
+      if(old && old.parentNode) old.parentNode.removeChild(old);
+      return true;
     }
-  }
-
-  function flip(dir){
-    var from=idx, to=idx+dir;
-    if(to<0||to>=views.length) return false;
-    idx=to;
-    if(reduced){ renderView(to); return true; }
-    animating=true;
-    var vF=views[from], vT=views[to];
-    if(dir>0){
-      leaf.style.left=(vF.l!=null?"50%":"0");
-      leafF.innerHTML=faces[vF.r];
-      leafB.innerHTML=faces[vT.l!=null?vT.l:vT.r];
-      pageR.innerHTML=faces[vT.r];               // revelado sob a folha que vira
-      leaf.className="leaf fwd pre";
-    }else{
-      leaf.style.left="0";
-      leafF.innerHTML=faces[vF.l!=null?vF.l:vF.r];
-      leafB.innerHTML=faces[vT.r];
-      if(vT.l!=null){pageL.style.display="";pageL.innerHTML=faces[vT.l];}
-      leaf.className="leaf bwd pre";
+    void el.offsetWidth;              // reflow: fixa o estado inicial antes de transicionar
+    el.classList.add("is-in");        // (nao usar rAF: nao dispara com a aba em segundo plano)
+    if(old){
+      old.style.setProperty("--dx", (-d)+"px");
+      old.classList.remove("is-in"); old.classList.add("is-out");
+      var done=false, kill=function(){ if(done) return; done=true;
+        if(old.parentNode) old.parentNode.removeChild(old); };
+      old.addEventListener("transitionend",kill,{once:true});
+      setTimeout(kill,700);                 // fallback se o transitionend nao vier
     }
-    prog.textContent=vT.m;
-    btnPrev.disabled=(to<=0); btnNext.disabled=(to>=views.length-1);
-    var done=false, fin=function(){ if(done)return; done=true; finalize(to); };
-    // dispara a rotação no próximo frame
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){
-      leaf.classList.remove("pre"); leaf.classList.add("turning");
-    });});
-    leaf.addEventListener("transitionend",fin,{once:true});
-    setTimeout(fin,950); // fallback
     return true;
   }
 
-  // ---- controle manual (livro desacoplado do scroll) ----
+  // ---- controle manual (desacoplado do scroll) ----
   var opened=false, inView=false;
   function hideHint(){ if(hint) hint.classList.add("gone"); }
   function go(dir){
-    if(animating){ pending+=dir; return; }   // acumula as viradas; rodam ao fim da atual
-    hideHint(); return flip(dir);
+    cancelAuto();                     // qualquer navegação cancela a virada automática pendente
+    var to=idx+dir;
+    if(to<0||to>=views.length) return false;
+    hideHint();
+    return show(to,dir);
   }
 
   btnPrev.addEventListener("click",function(){ go(-1); });
   btnNext.addEventListener("click",function(){ go(1); });
+
+  // swipe horizontal no mobile
+  var sx=0, sy=0, swiping=false;
+  deck.addEventListener("touchstart",function(e){
+    if(e.touches.length!==1) return;
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; swiping=true;
+  },{passive:true});
+  deck.addEventListener("touchend",function(e){
+    if(!swiping) return; swiping=false;
+    var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.abs(dx)>44 && Math.abs(dx)>Math.abs(dy)*1.4) go(dx<0?1:-1);
+  },{passive:true});
 
   // teclado (só quando a seção está visível)
   document.addEventListener("keydown",function(e){
@@ -822,21 +762,27 @@ section[id]{scroll-margin-top:72px}
     else if(e.key==="ArrowLeft"){ e.preventDefault(); go(-1); }
   });
 
-  // abre a capa sozinho ao entrar na seção; da 1ª folha em diante é manual
-  var io=new IntersectionObserver(function(entries){
-    var e=entries[0];
-    inView = e.isIntersecting && e.intersectionRatio>=0.5;
-    if(inView && !opened){
-      opened=true;
-      setTimeout(function(){ if(idx===0) go(1); }, 700);
-    }
-  },{threshold:[0,0.5,1]});
-  io.observe(track);
+  // sempre começa na capa; ela vira sozinha UMA vez, após o tempo de leitura. Depois: 100% manual.
+  var AUTO_DELAY=2600, autoT=null;
+  function cancelAuto(){ opened=true; if(autoT){ clearTimeout(autoT); autoT=null; } }
+  function armAuto(){
+    if(opened) return;
+    opened=true;
+    autoT=setTimeout(function(){ autoT=null; if(idx===0) go(1); }, AUTO_DELAY);
+  }
+  // observa o card (não o track): o track é mais alto que a viewport e nunca chegaria ao ratio alvo
+  if(window.IntersectionObserver){
+    var io=new IntersectionObserver(function(entries){
+      var e=entries[0];
+      inView = e.isIntersecting && e.intersectionRatio>=0.35;
+      if(inView) armAuto();
+    },{threshold:[0,0.35,0.7,1]});
+    io.observe(deck);
+  }else{
+    inView=true; armAuto();          // sem IntersectionObserver: não trava o teclado nem o auto
+  }
 
-  window.addEventListener("resize",function(){ applyLayout(); });
-  mq.addEventListener?mq.addEventListener("change",applyLayout):mq.addListener(applyLayout);
-
-  applyLayout();
+  show(0,1);   // capa
 
   /* ---- botão de like ao vivo (line-up) — chamado após SB_URL/SB_KEY existirem ---- */
   window.initLuLike=function(SB_URL, SB_KEY){
