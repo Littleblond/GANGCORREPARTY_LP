@@ -499,6 +499,324 @@ section[id]{scroll-margin-top:72px}
   </div>
 </section>
 
+<!-- ═══════════ LINE-UP · LIVRO INTERATIVO ═══════════ -->
+<style id="lineup-css">
+#lineup{--pink:#ff2fa0;--paper:#ece6da;--ink2:#0a0b0f;padding:0;position:relative}
+.lineup-track{position:relative}
+.lineup-stage{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:clamp(14px,2.4vh,26px);
+  padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 14px);overflow:hidden}
+.lu-head{text-align:center;z-index:2}
+.lu-head .eyebrow{margin-bottom:6px}
+.lu-sub{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.book-wrap{position:relative;perspective:2200px}
+.book{--bh:min(70dvh,540px);--bw:calc(var(--bh) * .72);position:relative;
+  width:calc(var(--bw) * 2);height:var(--bh);transform-style:preserve-3d}
+.book.is-mobile{--bw:min(84vw,380px);--bh:min(calc(84vw / .70),66dvh);width:var(--bw)}
+.book-spine{position:absolute;top:0;left:50%;transform:translateX(-50%);width:26px;height:100%;z-index:6;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.42),rgba(0,0,0,0))}
+.book.is-mobile .book-spine{display:none}
+.book-shadow{position:absolute;left:50%;bottom:-5%;transform:translateX(-50%);width:88%;height:44px;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.6),rgba(0,0,0,0) 70%);filter:blur(6px);z-index:-1}
+.page{position:absolute;top:0;width:50%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink2);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.18)}
+.page-left{left:0;border-radius:6px 2px 2px 6px}
+.page-right{left:50%;border-radius:2px 6px 6px 2px}
+.book.is-mobile .page-left{display:none}
+.book.is-mobile .page-right{left:0;width:100%;border-radius:6px}
+.leaf{position:absolute;top:0;left:50%;width:50%;height:100%;transform-style:preserve-3d;z-index:5;display:none;
+  transition:transform .82s cubic-bezier(.42,.13,.2,1)}
+.book.is-mobile .leaf{width:100%;left:0}
+.leaf.fwd{transform-origin:left center}
+.leaf.bwd{transform-origin:right center}
+.leaf.pre,.leaf.turning{display:block}
+.leaf.fwd.turning{transform:rotateY(-180deg)}
+.leaf.bwd.turning{transform:rotateY(180deg)}
+.leaf-face{position:absolute;inset:0;overflow:hidden;background:var(--paper);color:var(--ink2);
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:2px 6px 6px 2px}
+.leaf-back{transform:rotateY(180deg);border-radius:6px 2px 2px 6px}
+.leaf-shade{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;
+  background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,0) 42%,rgba(0,0,0,0) 58%,rgba(0,0,0,.3))}
+.leaf.turning .leaf-shade{animation:luShade .82s ease}
+@keyframes luShade{0%{opacity:0}48%{opacity:1}100%{opacity:0}}
+/* textura de papel */
+.pg{position:absolute;inset:0;overflow:hidden}
+.pg::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E")}
+/* página de texto */
+.pg-text{display:flex;flex-direction:column;padding:clamp(16px,3.2vh,30px);background:var(--paper)}
+.pg-num{font-family:var(--display);font-size:clamp(3.4rem,11vh,6rem);line-height:.8;color:var(--pink);letter-spacing:-.02em}
+.pg-tech{font-family:var(--mono);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:#8a8272;margin:8px 0 auto;
+  border-top:1px solid rgba(10,11,15,.25);border-bottom:1px solid rgba(10,11,15,.25);padding:6px 0;display:flex;justify-content:space-between;gap:8px}
+.pg-name{font-family:var(--display);font-size:clamp(2rem,6vh,3.4rem);line-height:.9;color:var(--ink2);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.01em}
+.pg-role{font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--pink);margin-bottom:12px}
+.pg-genres{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.pg-genres span{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:#4a463d;
+  border:1px solid rgba(10,11,15,.3);border-radius:999px;padding:3px 8px}
+.pg-desc{max-width:34ch;overflow:auto}
+.pg-desc p{font-size:clamp(.74rem,1.7vh,.9rem);line-height:1.55;color:#33302a;margin-bottom:10px}
+.pg-foot{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:#8a8272}
+/* página de foto */
+.pg-photo{background:#0a0b0f}
+.pg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 40%)}
+.pg-photo::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,11,15,.42) 0%,rgba(10,11,15,0) 26%,rgba(10,11,15,0) 55%,rgba(10,11,15,.72) 100%)}
+.pg-photo .pg-ph-n{position:absolute;top:12px;left:14px;z-index:2;font-family:var(--display);font-size:2.4rem;line-height:.8;color:#fff;mix-blend-mode:difference}
+.pg-photo .pg-ph-tag{position:absolute;top:20px;right:14px;z-index:2;font-family:var(--mono);font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.82);text-align:right}
+.pg-photo .pg-ph-name{position:absolute;left:14px;right:14px;bottom:14px;z-index:2;font-family:var(--display);
+  font-size:clamp(1.7rem,4.6vh,2.8rem);line-height:.86;color:#fff;text-transform:uppercase;letter-spacing:.01em}
+.pg-photo .pg-ph-name small{display:block;font-family:var(--mono);font-size:.5rem;letter-spacing:.18em;color:var(--pink);margin-top:5px}
+/* capa e contracapa */
+.pg-cover,.pg-back{background:radial-gradient(120% 90% at 30% 20%,#1b1e26 0%,#0a0b0f 70%);color:#fff;
+  display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vh,34px);
+  border:1px solid rgba(255,47,160,.28)}
+.pg-cover .eyebrow{color:var(--pink);margin:0}
+.cover-mid{display:flex;flex-direction:column;gap:6px}
+.cover-kicker{font-family:var(--mono);font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.cover-title{font-family:var(--display);font-size:clamp(2.6rem,9vh,5rem);line-height:.82;text-transform:uppercase;letter-spacing:.01em;margin:0}
+.cover-date{font-family:var(--display);font-size:clamp(1.8rem,5vh,3rem);color:var(--pink);line-height:1}
+.cover-date.sm{font-size:1.4rem}
+.cover-bot{font-family:var(--mono);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);max-width:24ch}
+.pg-cover::after,.pg-back::after{opacity:.35}
+.pg-back{justify-content:center;align-items:flex-start;gap:14px;text-align:left}
+.back-title{font-family:var(--display);font-size:clamp(2.4rem,8vh,4.4rem);line-height:.84;text-transform:uppercase;margin:0}
+.back-brand{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.pg-spine{background:repeating-linear-gradient(90deg,#0a0b0f,#0a0b0f 2px,#15171d 2px,#15171d 4px)}
+/* controles */
+.lu-controls{display:flex;align-items:center;gap:16px;z-index:2}
+.lu-nav{width:44px;height:44px;border-radius:999px;border:1px solid var(--line);background:rgba(24,28,34,.8);
+  color:var(--text);font-size:1.3rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:border-color .25s,color .25s,background .25s}
+.lu-nav:hover{border-color:var(--pink);color:var(--pink)}
+.lu-nav:disabled{opacity:.3;cursor:default;pointer-events:none}
+.lu-progress{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text);min-width:76px;text-align:center;font-variant-numeric:tabular-nums}
+.lu-hint{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);z-index:2;
+  transition:opacity .4s}
+.lu-hint.gone{opacity:0}
+@media (max-width:720px){.lu-sub{display:none}}
+@media (prefers-reduced-motion:reduce){.leaf{transition:none!important}.leaf.turning .leaf-shade{animation:none}}
+</style>
+
+<section id="lineup" aria-label="Line-up da Gang Corre Party">
+  <div class="lineup-track" id="lu-track">
+    <div class="lineup-stage">
+      <div class="lu-head">
+        <div class="eyebrow">O line-up</div>
+        <div class="lu-sub">Um álbum · três sets · uma pista</div>
+      </div>
+      <div class="book-wrap">
+        <div class="book" id="lu-book">
+          <div class="page page-left" id="lu-left" aria-hidden="true"></div>
+          <div class="page page-right" id="lu-right"></div>
+          <div class="leaf" id="lu-leaf" aria-hidden="true">
+            <div class="leaf-face leaf-front" id="lu-front"></div>
+            <div class="leaf-face leaf-back" id="lu-back"></div>
+            <div class="leaf-shade"></div>
+          </div>
+          <div class="book-spine"></div>
+        </div>
+        <div class="book-shadow"></div>
+      </div>
+      <div class="lu-controls">
+        <button class="lu-nav" id="lu-prev" type="button" aria-label="Página anterior">&#8249;</button>
+        <div class="lu-progress" id="lu-prog" aria-live="polite">Capa</div>
+        <button class="lu-nav" id="lu-next" type="button" aria-label="Próxima página">&#8250;</button>
+      </div>
+      <div class="lu-hint" id="lu-hint">role ou arraste para virar</div>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  var book=document.getElementById("lu-book"); if(!book) return;
+  var track=document.getElementById("lu-track"),
+      pageL=document.getElementById("lu-left"), pageR=document.getElementById("lu-right"),
+      leaf=document.getElementById("lu-leaf"), leafF=document.getElementById("lu-front"),
+      leafB=document.getElementById("lu-back"), prog=document.getElementById("lu-prog"),
+      btnPrev=document.getElementById("lu-prev"), btnNext=document.getElementById("lu-next"),
+      hint=document.getElementById("lu-hint");
+  var reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var mq=matchMedia("(max-width:720px)");
+  var ZONE_VH=88;
+
+  var ARTISTS=[
+    {n:"01",name:"DanniDarkko",role:"Primeira atração",
+     genres:["Afro House","Funkhall","Electro House","Submundo"],
+     img:"assets/lineup/dannidarkko.jpg",pos:"50% 34%",
+     alt:"DanniDarkko discotecando ao pôr do sol, com o braço erguido para o público.",
+     desc:["Presente desde os primeiros encontros em que a corrida virou pista, DanniDarkko fez parte da Running Music 1, Running Music 2 e também da Ultra Coffee Party.",
+           "Agora, abre a Gang Corre Party com um set que atravessa Afro House, Funkhall, Electro House e algumas camadas de Submundo. Uma mistura feita para criar atmosfera, aumentar a temperatura e colocar a noite em movimento desde o primeiro beat."]},
+    {n:"02",name:"Arags",role:"Segunda atração",
+     genres:["Open Format","Funk","Tech House","Deep House"],
+     img:"assets/lineup/arags.jpg",pos:"50% 28%",
+     alt:"Arags no meio da multidão de um treino da Running Gang ao entardecer, fones no pescoço.",
+     desc:["Corro com a Gang, mas também comando as pick-ups dela. Procuro ler o ritmo de um treino da mesma forma que busco entender e conduzir a energia de uma pista.",
+           "Depois de participar da Running Music 1 e 2, chegou a vez da Gang Corre Party, o aniversário de um ano da Running Gang.",
+           "Levo para o set uma pegada open format, passando por funk, tech e deep house, sempre acompanhando o momento da festa. Que esse aniversário marque o início de uma Running que também vive a noite."]},
+    {n:"03",name:"Louis",role:"Terceira atração · Closing set",
+     genres:["Tech House","Afro House","Indie Dance"],
+     img:"assets/lineup/louis.jpg",pos:"50% 40%",
+     alt:"Louis ajustando os fones, com boné para trás e camiseta da Running Gang.",
+     desc:["Fechar uma pista é conduzir o ápice da noite, manter a conexão e entregar o resto de energia que o corpo nem sabia que ainda tinha.",
+           "Nesta edição da Gang Corre Party, Louis apresenta um set pensado para lavar a alma: transições pesadas entre Tech House, Afro House e Indie Dance, misturando graves marcantes, vocais envolventes e muita percussão.",
+           "A expectativa é uma pista unida, dançando até o último beat. A gente se encontra no final."]}
+  ];
+  var esc=function(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");};
+
+  function facePhoto(a){
+    return '<div class="pg pg-photo" style="--pos:'+a.pos+'">'
+      +'<img class="pg-img" src="'+a.img+'" alt="'+esc(a.alt)+'" loading="lazy" decoding="async">'
+      +'<span class="pg-ph-n">'+a.n+'</span>'
+      +'<span class="pg-ph-tag">GANG CORRE PARTY<br>REC · UMU · 29.08</span>'
+      +'<div class="pg-ph-name">'+esc(a.name)+'<small>'+esc(a.role)+'</small></div></div>';
+  }
+  function faceText(a,i,total){
+    var g=a.genres.map(function(x){return '<span>'+esc(x)+'</span>';}).join("");
+    var d=a.desc.map(function(p){return '<p>'+esc(p)+'</p>';}).join("");
+    return '<div class="pg pg-text">'
+      +'<div class="pg-num">'+a.n+'</div>'
+      +'<div class="pg-tech"><span>SIDE '+a.n+'</span><span>SET · 0'+(i+1)+' / 0'+total+'</span></div>'
+      +'<h3 class="pg-name">'+esc(a.name)+'</h3>'
+      +'<div class="pg-role">'+esc(a.role)+'</div>'
+      +'<div class="pg-genres">'+g+'</div>'
+      +'<div class="pg-desc">'+d+'</div>'
+      +'<div class="pg-foot"><span>Gang Corre Party</span><span>0'+(i+1)+' / 0'+total+'</span></div></div>';
+  }
+  var COVER='<div class="pg pg-cover"><div class="eyebrow">O line-up</div>'
+    +'<div class="cover-mid"><div class="cover-kicker">Gang Corre Party</div>'
+    +'<h3 class="cover-title">The<br>Line-up</h3><div class="cover-date">29.08</div></div>'
+    +'<div class="cover-bot">Um ano de Running Gang · três sets · uma pista</div></div>';
+  var BACK='<div class="pg pg-back"><h3 class="back-title">Até o<br>último<br>beat.</h3>'
+    +'<div class="cover-date sm">29.08</div><div class="back-brand">Gang Corre Party</div></div>';
+  var SPINE='<div class="pg pg-spine"></div>';
+
+  // faces: 0 cover, [1 photo,2 text]*3, 7 back, 8 spine
+  var faces=[COVER];
+  ARTISTS.forEach(function(a,i){ faces.push(facePhoto(a)); faces.push(faceText(a,i,ARTISTS.length)); });
+  faces.push(BACK); faces.push(SPINE);
+  var SP=faces.length-1, BK=SP-1;
+
+  var viewsDesk=[
+    {l:SP,r:0,m:"Capa"},
+    {l:1,r:2,m:"01 / 03"},
+    {l:3,r:4,m:"02 / 03"},
+    {l:5,r:6,m:"03 / 03"},
+    {l:BK,r:SP,m:"Fim"}
+  ];
+  var viewsMob=[
+    {r:0,m:"Capa"},{r:1,m:"01 · foto"},{r:2,m:"01 / 03"},
+    {r:3,m:"02 · foto"},{r:4,m:"02 / 03"},{r:5,m:"03 · foto"},
+    {r:6,m:"03 / 03"},{r:7,m:"Fim"}
+  ];
+  var views=viewsDesk, idx=0, animating=false;
+
+  function applyLayout(){
+    var mobile=mq.matches;
+    book.classList.toggle("is-mobile", mobile);
+    var canonical=views[idx]?views[idx].r:0;
+    views=mobile?viewsMob:viewsDesk;
+    var best=0,bd=1e9;
+    for(var i=0;i<views.length;i++){var dd=Math.abs(views[i].r-canonical);if(dd<bd){bd=dd;best=i;}}
+    idx=best;
+    track.style.height=(views.length*ZONE_VH)+"vh";
+    renderView(idx);
+  }
+  function renderView(i){
+    var v=views[i];
+    if(v.l!=null){pageL.style.display="";pageL.innerHTML=faces[v.l];}
+    else{pageL.style.display="none";pageL.innerHTML="";}
+    pageR.innerHTML=faces[v.r];
+    prog.textContent=v.m;
+    btnPrev.disabled=(i<=0); btnNext.disabled=(i>=views.length-1);
+  }
+  function finalize(to){ leaf.className="leaf"; animating=false; renderView(to);
+    requestAnimationFrame(syncToScroll); }
+
+  function flip(dir){
+    var from=idx, to=idx+dir;
+    if(to<0||to>=views.length) return false;
+    idx=to;
+    if(reduced){ renderView(to); return true; }
+    animating=true;
+    var vF=views[from], vT=views[to];
+    if(dir>0){
+      leaf.style.left=(vF.l!=null?"50%":"0");
+      leafF.innerHTML=faces[vF.r];
+      leafB.innerHTML=faces[vT.l!=null?vT.l:vT.r];
+      pageR.innerHTML=faces[vT.r];               // revelado sob a folha que vira
+      leaf.className="leaf fwd pre";
+    }else{
+      leaf.style.left="0";
+      leafF.innerHTML=faces[vF.l!=null?vF.l:vF.r];
+      leafB.innerHTML=faces[vT.r];
+      if(vT.l!=null){pageL.style.display="";pageL.innerHTML=faces[vT.l];}
+      leaf.className="leaf bwd pre";
+    }
+    prog.textContent=vT.m;
+    btnPrev.disabled=(to<=0); btnNext.disabled=(to>=views.length-1);
+    var done=false, fin=function(){ if(done)return; done=true; finalize(to); };
+    // dispara a rotação no próximo frame
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      leaf.classList.remove("pre"); leaf.classList.add("turning");
+    });});
+    leaf.addEventListener("transitionend",fin,{once:true});
+    setTimeout(fin,950); // fallback
+    return true;
+  }
+
+  // ---- scroll → página ----
+  function syncToScroll(){
+    if(animating) return;
+    var total=track.offsetHeight-window.innerHeight;
+    if(total<=0) return;
+    var y=Math.min(Math.max(window.scrollY-track.offsetTop,0),total);
+    var p=y/total;
+    var target=Math.min(views.length-1, Math.floor(p*views.length));
+    if(target!==idx) flip(target>idx?1:-1);
+  }
+  function scrollToView(s){
+    s=Math.min(views.length-1,Math.max(0,s));
+    var total=track.offsetHeight-window.innerHeight;
+    var y=track.offsetTop + ((s+0.5)/views.length)*total;
+    window.scrollTo({top:y, behavior:reduced?"auto":"smooth"});
+  }
+  function nudge(d){ if(hint) hint.classList.add("gone"); scrollToView(idx+d); }
+
+  var ticking=false;
+  function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(function(){ ticking=false; syncToScroll(); }); }
+    if(hint && window.scrollY>track.offsetTop-window.innerHeight*0.3) hint.classList.add("gone"); }
+
+  btnPrev.addEventListener("click",function(){nudge(-1);});
+  btnNext.addEventListener("click",function(){nudge(1);});
+
+  // teclado (só quando a seção está fixada na tela)
+  function stageVisible(){ var r=track.getBoundingClientRect();
+    return r.top<=1 && r.bottom>=window.innerHeight-1; }
+  document.addEventListener("keydown",function(e){
+    if(!stageVisible()) return;
+    if(e.key==="ArrowRight"){ e.preventDefault(); nudge(1); }
+    else if(e.key==="ArrowLeft"){ e.preventDefault(); nudge(-1); }
+  });
+
+  // swipe horizontal no mobile
+  var tx=0,ty=0,tracking=false;
+  var stage=track.querySelector(".lineup-stage");
+  stage.addEventListener("touchstart",function(e){ if(e.touches.length!==1)return;
+    tx=e.touches[0].clientX; ty=e.touches[0].clientY; tracking=true; },{passive:true});
+  stage.addEventListener("touchend",function(e){ if(!tracking)return; tracking=false;
+    var t=e.changedTouches[0], dx=t.clientX-tx, dy=t.clientY-ty;
+    if(Math.abs(dx)>46 && Math.abs(dx)>Math.abs(dy)*1.3){ nudge(dx<0?1:-1); } },{passive:true});
+
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",function(){ applyLayout(); });
+  mq.addEventListener?mq.addEventListener("change",applyLayout):mq.addListener(applyLayout);
+
+  applyLayout();
+  syncToScroll();
+})();
+</script>
+
 <!-- GRUPO VIP WHATSAPP -->
 <section id="grupo-vip" style="padding-top:0">
   <div class="container narrow">
