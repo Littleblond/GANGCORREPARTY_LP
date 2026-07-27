@@ -792,10 +792,19 @@ section[id]{scroll-margin-top:72px}
     if(!btn||!cnt||!SB_URL||!SB_KEY) return;
     var current=0, cooldown=false;
 
+    /* leitura: RPC publica gcp_get_likes (so devolve um numero) */
     function rpc(fn){
       return fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",
         headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},
         body:JSON.stringify({})}).then(function(r){return r.ok?r.json():0;}).catch(function(){return 0;});
+    }
+    /* escrita: passa pela Edge Function add-like (rate limit por IP).
+       A RPC gcp_add_like nao responde mais ao anon. */
+    function addLike(){
+      return fetch(SB_URL+"/functions/v1/add-like",{method:"POST",
+        headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},
+        body:"{}"}).then(function(r){return r.ok?r.json():null;})
+        .then(function(d){ return d&&d.total ? d.total : 0; }).catch(function(){return 0;});
     }
     function setCount(n){
       n=parseInt(n,10)||0; if(n===current) return;
@@ -811,7 +820,7 @@ section[id]{scroll-margin-top:72px}
       cooldown=true; btn.setAttribute("aria-busy","true");
       setCount(current+1);
       btn.classList.remove("did"); void btn.offsetWidth; btn.classList.add("did");
-      rpc("gcp_add_like").then(function(n){
+      addLike().then(function(n){
         if(n) setCount(n);
         setTimeout(function(){ cooldown=false; btn.removeAttribute("aria-busy"); }, 1500);
       });
