@@ -1024,7 +1024,12 @@ var CHECKOUT_URL = "https://checkout.infinitepay.io/nathalialouise?lenc=G-sAAOT_
 /* Quando o 1º lote abre. Antes disso o botão abre o grupo VIP; a partir daqui
    (E com CHECKOUT_URL preenchido) todos os botões viram compra direta, sozinho. */
 var LOTE_ABRE = "2026-07-23T19:00:00-03:00";
-/* Preço mostrado no lugar de "VALOR SURPRESA" depois que abre. Ex: "R$ 65". Vazio = mantém texto. */
+/* Preço mostrado no lugar de "VALOR SURPRESA" depois que abre. Ex: "R$ 65". Vazio = mantém texto.
+   ATENÇÃO — isto é só VITRINE. A fonte de verdade do preço é o banco:
+   gcp_ticket_lots.price_cents do lote ativo (checkout-create calcula no servidor
+   e nunca confia no front). Ao trocar de lote/preço, atualize os DOIS lugares:
+   1) price_cents do lote ativo em gcp_ticket_lots;  2) PRECO_LOTE aqui.
+   Se divergirem, o comprador vê um valor e paga outro (o do banco). */
 var PRECO_LOTE = "R$ 50";
 var DATA_EVENTO   = "2026-08-29T20:00:00-03:00";
 var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
@@ -1055,7 +1060,7 @@ function openBuy(){
     buyEl = document.createElement("div");
     buyEl.className = "modal";
     buyEl.innerHTML = '<div class="back" data-bclose></div><div class="box"><button class="x" type="button" data-bclose>×</button>'
-      + '<h3>Garantir ingresso</h3><p class="sub">1º lote · R$ 50. Preenche que a gente registra e te leva pro pagamento.</p>'
+      + '<h3>Garantir ingresso</h3><p class="sub">1º lote · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.</p>'
       + '<form id="buy-form"><label>Seu nome</label><input id="buy-nome" required maxlength="120" autocomplete="name">'
       + '<label>WhatsApp</label><input id="buy-zap" required maxlength="40" inputmode="tel" autocomplete="tel">'
       + '<label>CPF (opcional)</label><input id="buy-cpf" maxlength="20" inputmode="numeric" autocomplete="off">'

@@ -55,7 +55,9 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch { return json({ error: "invalid_json" }, 400, cors); }
 
-  // validação estrita da entrada
+  // Validação estrita da entrada. O 20 aqui é só sanidade de tipo/faixa (barra
+  // payload absurdo antes de bater no banco); o teto REAL é lot.max_per_order
+  // (default 6), checado logo depois de ler o lote ativo.
   const quantity = Number(body?.quantity);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20)
     return json({ error: "invalid_quantity" }, 400, cors);
@@ -72,7 +74,8 @@ Deno.serve(async (req) => {
 
   const db = createClient(SB_URL, SB_SR, { auth: { persistSession: false } });
 
-  // preço e disponibilidade: fonte de verdade = banco
+  // preço e disponibilidade: fonte de verdade = banco (price_cents do lote ativo).
+  // O PRECO_LOTE do index.html é só vitrine e precisa espelhar este valor.
   let lotQuery = db.from("gcp_ticket_lots").select("*").eq("active", true);
   lotQuery = lotId ? lotQuery.eq("id", lotId) : lotQuery.order("sort", { ascending: true });
   const { data: lots, error: lotErr } = await lotQuery.limit(1);
