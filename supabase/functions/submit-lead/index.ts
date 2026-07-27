@@ -45,15 +45,26 @@ Deno.serve(async (req) => {
   const ff = Number(b?.ff);
   if (Number.isFinite(ff) && ff < 2500) return json({ ok: true }, 200, cors);
 
-  const kind = b?.kind === "sponsor" ? "sponsor" : b?.kind === "inscricao" ? "inscricao" : null;
+  const KINDS = new Set(["sponsor", "inscricao", "checkout_fallback"]);
+  const kind = KINDS.has(b?.kind) ? String(b.kind) : null;
   if (!kind) return json({ error: "invalid_kind" }, 400, cors);
 
   const nome = clean(b?.nome, 120);
   if (nome.length < 2) return json({ error: "invalid_name" }, 400, cors);
 
+  // checkout_fallback nao usa RPC: grava direto em gcp_fallback_leads (service_role).
   let ident = "";
   let rpc = "", args: Record<string, unknown> = {};
-  if (kind === "inscricao") {
+  let fallback: { nome: string; whatsapp: string; cpf: string | null } | null = null;
+  if (kind === "checkout_fallback") {
+    // Venda que caiu no link estatico da InfinitePay: sem pedido, sem ingresso.
+    // So o contato, pra reconciliar na mao depois. Email/termo nao se aplicam.
+    const whatsapp = digits(clean(b?.whatsapp, 40));
+    const cpf = clean(b?.cpf, 20).replace(/[^\d]/g, "");
+    if (whatsapp.length < 8) return json({ error: "invalid_phone" }, 400, cors);
+    ident = whatsapp;
+    fallback = { nome, whatsapp, cpf: cpf || null };
+  } else if (kind === "inscricao") {
     const whatsapp = digits(clean(b?.whatsapp, 40));
     const email = clean(b?.email, 160).toLowerCase();
     if (!isEmail(email)) return json({ error: "invalid_email" }, 400, cors);
@@ -90,7 +101,9 @@ Deno.serve(async (req) => {
 
   await db.from("gcp_form_hits").insert({ kind, ip_hash: ipHash, ident_hash: identHash });
 
-  const { error } = await db.rpc(rpc, args);
+  const { error } = fallback
+    ? await db.from("gcp_fallback_leads").insert(fallback)
+    : await db.rpc(rpc, args);
   if (error) return json({ error: "server_error" }, 500, cors);
 
   return json({ ok: true }, 200, cors);

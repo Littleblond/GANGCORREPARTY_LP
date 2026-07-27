@@ -1064,7 +1064,20 @@ function doBuy(e){
   var send = byId("buy-send"), err = byId("buy-err");
   err.style.display="none"; send.disabled=true; send.textContent="Aguarde…";
   var body = { quantity:1, customer:{ name: byId("buy-nome").value, phone: byId("buy-zap").value, cpf: byId("buy-cpf").value } };
-  var fb = function(){ window.location.href = CHECKOUT_URL; }; /* fallback: link estatico */
+  /* Fallback: backend fora do ar. Registra o contato (kind checkout_fallback)
+     pra reconciliacao manual e SEMPRE redireciona pro link estatico — a venda
+     nao pode quebrar. Esse caminho NAO cria pedido nem ingresso: o pagamento
+     cai direto na InfinitePay e tem que ser conciliado na mao. */
+  var fb = function(){
+    var done=false;
+    var go=function(){ if(done) return; done=true; window.location.href = CHECKOUT_URL; };
+    setTimeout(go, 1200); /* o lead nunca segura a compra */
+    try{
+      var lead = { kind:"checkout_fallback", nome: byId("buy-nome").value, whatsapp: byId("buy-zap").value, cpf: byId("buy-cpf").value };
+      fetch(SB_URL+"/functions/v1/submit-lead", {method:"POST",keepalive:true,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(lead)})
+        .then(go, go);
+    }catch(e){ go(); }
+  };
   fetch(SB_URL+"/functions/v1/checkout-create", {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){ return r.json(); })
     .then(function(d){ if(d && d.checkout_url){ window.location.href = d.checkout_url; } else { throw 0; } })
