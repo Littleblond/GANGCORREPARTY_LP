@@ -17,6 +17,7 @@ function corsHeaders(origin: string | null) {
     "Access-Control-Allow-Origin": o,
     "Access-Control-Allow-Headers": "authorization, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
   };
 }
@@ -95,7 +96,9 @@ Deno.serve(async (req) => {
   }).select("id").single();
   if (insErr || !order) return json({ error: "server_error" }, 500, cors);
 
-  await db.from("gcp_order_items").insert({
+  // itens não bloqueiam a chamada à InfinitePay — correm em paralelo e são
+  // conferidos antes de responder (pedido sem itens não pode ir pro checkout)
+  const itemsIns = db.from("gcp_order_items").insert({
     order_id: order.id, lot_id: lot.id,
     description_snapshot: lot.name, unit_price: lot.price_cents,
     quantity, total_price: expected,
@@ -108,15 +111,19 @@ Deno.serve(async (req) => {
   const timer = setTimeout(() => ac.abort(), 10000);
   let payUrl = "";
   try {
-    const r = await fetch(`${IP_BASE}/links`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: ac.signal,
-      body: JSON.stringify({
-        handle: HANDLE, order_nsu, redirect_url, webhook_url,
-        items: [{ quantity, price: lot.price_cents, description: lot.name }],
+    const [r, itemsRes] = await Promise.all([
+      fetch(`${IP_BASE}/links`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: ac.signal,
+        body: JSON.stringify({
+          handle: HANDLE, order_nsu, redirect_url, webhook_url,
+          items: [{ quantity, price: lot.price_cents, description: lot.name }],
+        }),
       }),
-    });
+      itemsIns,
+    ]);
+    if (itemsRes.error) throw new Error("items_insert_failed");
     const data = await r.json().catch(() => ({}));
     payUrl = data?.url ?? "";
     if (!r.ok || !payUrl) throw new Error("no_url");
@@ -127,9 +134,13 @@ Deno.serve(async (req) => {
   }
   clearTimeout(timer);
 
-  await db.from("gcp_orders")
+  // grava o link em background — o comprador não espera esse update pra ser redirecionado
+  const saveLink = db.from("gcp_orders")
     .update({ payment_link: payUrl, status: "payment_link_created" })
-    .eq("id", order.id);
+    .eq("id", order.id)
+    .then(() => {});
+  const rt = (globalThis as any).EdgeRuntime;
+  if (rt?.waitUntil) rt.waitUntil(saveLink); else await saveLink;
 
   // devolve só o necessário pro redirect
   return json({ checkout_url: payUrl, order_nsu, public_token }, 200, cors);

@@ -12,6 +12,8 @@
 <meta property="og:image" content="https://gangcorreparty-lp.vercel.app/assets/hero-poster.jpg">
 <meta property="og:url" content="https://gangcorreparty-lp.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://checkout.infinitepay.io">
+<link rel="preconnect" href="https://asppjvxeqpfsonknukla.supabase.co">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1026,6 +1028,16 @@ try{ if(window.initLuLike) window.initLuLike(SB_URL, SB_KEY); }catch(e){ console
 
 var byId = function(id){ return document.getElementById(id); };
 
+/* ---- Esquenta o checkout: acorda a Edge Function (cold start) e resolve o
+   preflight CORS antes do comprador clicar. try/catch: falha aqui não pode
+   afetar nada — é só aquecimento. ---- */
+function warmCheckout(){
+  try{
+    fetch(SB_URL+"/functions/v1/checkout-create",{method:"OPTIONS"}).catch(function(){});
+  }catch(e){}
+}
+warmCheckout();
+
 /* ---- Compra: coleta nome/whatsapp/cpf, cria pedido no backend (comprador vai pro CRM),
    e manda pro checkout InfinitePay. Se o backend falhar, cai no link estatico (venda nunca quebra). ---- */
 var buyEl;
@@ -1045,6 +1057,7 @@ function openBuy(){
     buyEl.querySelector("#buy-form").addEventListener("submit", doBuy);
   }
   buyEl.classList.add("on");
+  warmCheckout(); /* re-aquece: comprador leva um tempo preenchendo o formulário */
 }
 function doBuy(e){
   e.preventDefault();
