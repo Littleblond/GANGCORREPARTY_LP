@@ -41,13 +41,20 @@ Deno.serve(async (req) => {
 
   // Honeypot: campo invisivel. Bot preenche -> fingimos sucesso e nao inserimos.
   if (clean(b?.website, 100) !== "") return json({ ok: true }, 200, cors);
-  // Tempo minimo de preenchimento (ms). Rapido demais = bot -> sucesso falso.
-  const ff = Number(b?.ff);
-  if (Number.isFinite(ff) && ff < 2500) return json({ ok: true }, 200, cors);
 
   const KINDS = new Set(["sponsor", "inscricao", "checkout_fallback"]);
   const kind = KINDS.has(b?.kind) ? String(b.kind) : null;
   if (!kind) return json({ error: "invalid_kind" }, 400, cors);
+
+  // Tempo minimo de preenchimento (ms). Rapido demais = bot -> sucesso falso.
+  // ff AUSENTE tambem reprova: antes um bot pulava a checagem so nao mandando
+  // o campo. Os forms da LP sempre enviam (sbForm preenche body.ff).
+  // checkout_fallback fica de fora: nao vem de formulario com tempo medido,
+  // e sim do doBuy com a compra em andamento — reprovar ali perderia o lead.
+  if (kind !== "checkout_fallback") {
+    const ff = Number(b?.ff);
+    if (!Number.isFinite(ff) || ff < 2500) return json({ ok: true }, 200, cors);
+  }
 
   const nome = clean(b?.nome, 120);
   if (nome.length < 2) return json({ error: "invalid_name" }, 400, cors);
