@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gcp-lp",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8802"],
+      "port": 8802
+    }
+  ]
+}

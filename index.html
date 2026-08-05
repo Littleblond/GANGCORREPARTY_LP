@@ -269,6 +269,24 @@ section[id]{scroll-margin-top:72px}
 .final .logos img{height:52px;width:auto;opacity:.9}
 .final .logos img.rg{height:46px}
 
+/* cupom (última seção da página) */
+.cupom{margin:0 1rem 1rem;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);padding:52px 24px;text-align:center}
+.cupom .wrap{max-width:460px;margin:0 auto}
+.cupom h2{font-size:clamp(1.8rem,5vw,2.6rem);margin-bottom:10px}
+.cupom .sub{margin:0 auto 24px}
+.cupom .row{display:flex;gap:10px;align-items:stretch}
+.cupom input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);
+  font-family:var(--mono);font-size:1rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:14px 16px;transition:border-color .3s}
+.cupom input:focus{outline:none;border-color:var(--accent)}
+.cupom input::placeholder{color:var(--muted);letter-spacing:.12em;font-weight:400}
+.cupom .btn{flex:0 0 auto}
+.cupom .msg{display:none;margin-top:14px;font-family:var(--mono);font-size:.76rem;letter-spacing:.06em}
+.cupom .msg.on{display:block}
+.cupom .msg.bad{color:#E8622C}
+.cupom .msg.good{color:var(--accent)}
+.cupom .hint{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:18px}
+@media (max-width:520px){.cupom .row{flex-direction:column}.cupom .btn{width:100%}}
+
 /* footer */
 .foot{padding:30px 24px calc(30px + env(safe-area-inset-bottom));text-align:center;color:var(--muted);font-family:var(--mono);font-size:.72rem;line-height:1.8}
 .foot a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
@@ -904,6 +922,21 @@ section[id]{scroll-margin-top:72px}
   </div>
 </footer>
 
+<!-- 14.1 CUPOM (última seção antes do rodapé) -->
+<section class="cupom rv" id="cupom" aria-label="Cupom de desconto">
+  <div class="wrap">
+    <div class="eyebrow">Última chamada</div>
+    <h2 id="cupom-title">Tem um cupom?</h2>
+    <p class="sub" id="cupom-sub">Digita o código aí embaixo pra liberar o desconto antes de fechar o ingresso.</p>
+    <form class="row" id="cupom-form">
+      <input id="cupom-input" name="cupom" placeholder="SEU CUPOM" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Código do cupom">
+      <button class="btn" type="submit" id="cupom-send">Aplicar</button>
+    </form>
+    <div class="msg" id="cupom-msg" role="status" aria-live="polite"></div>
+    <div class="hint">Cupom válido só enquanto durar o lote</div>
+  </div>
+</section>
+
 <!-- 15. RODAPÉ -->
 <div class="foot">
   Gang Corre Party · 29/08 · Seu Jorge Boteco, Umuarama-PR<br>
@@ -1021,6 +1054,15 @@ var GRUPO_VIP_URL = "https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6";
 /* Link de pagamento da InfinitePay. VAZIO = botão abre o grupo VIP (como agora).
    Quando o lote abrir, cole aqui o link e todos os botões viram compra direta. */
 var CHECKOUT_URL = "https://checkout.infinitepay.io/nathalialouise?lenc=G-sAAOT_Tn0FLsiBZIKWKnRrJv8yQTq1AmuL93me3jxQKwyCtrB5LcsyCfSgB_1BN1aCGJw_xoO2-dWMu3-47oa35jEpAvQyiS1UcBJ6vmraGxosNVTlkdQPq4sfOjtS7f98fwe4TNmy1q3sOsjN5wLaVmagI0EFoFmAOrdQ03BSUr5sJEfB0D_aHQ94aMNUPo-K55gc2lYK-5qEmI6y5TKkNMYMWGs1FWA3.v1.b997a465fc145205";
+/* Cupom de desconto (seção no fim da página). Código é comparado sem acento/caixa.
+   CUPOM_CHECKOUT_URL é um link ESTÁTICO da InfinitePay já com o preço com desconto:
+   quem usa cupom NÃO passa pelo checkout-create (o backend calcula o preço cheio).
+   Ou seja, esse caminho não cria pedido nem ingresso no banco — só registra o lead
+   (kind checkout_fallback, tabela gcp_fallback_leads) pra reconciliação manual,
+   igual ao fallback do link estático. Vazio = cupom desligado (seção some). */
+var CUPOM_CODIGO = "FIMDAERA";
+var CUPOM_OFF = 15; /* % de desconto — só vitrine; o preço real é o do link acima */
+var CUPOM_CHECKOUT_URL = "https://checkout.infinitepay.io/nathalialouise?lenc=G58AYIzUWc2Ni02c6wY2wPZoo6iiBJk-ZlKCfg2J6-TAISsIvgVBIAdpK4MMAt1YaEaxjL0JgjE9G5NGlMKs-D0J3CWSF1iR5pj6OZaQhMbKWiegt8rnNVRyW_EdJVoYG-aax30yADZ89w8uTij6WpxRlKbGDfTaLSGSxbfu_EEjAjIqcg.v1.8d22a006f9f6f70e";
 /* Quando o 1º lote abre. Antes disso o botão abre o grupo VIP; a partir daqui
    (E com CHECKOUT_URL preenchido) todos os botões viram compra direta, sozinho. */
 var LOTE_ABRE = "2026-07-23T19:00:00-03:00";
@@ -1055,12 +1097,37 @@ warmCheckout();
 /* ---- Compra: coleta nome/whatsapp/cpf, cria pedido no backend (comprador vai pro CRM),
    e manda pro checkout InfinitePay. Se o backend falhar, cai no link estatico (venda nunca quebra). ---- */
 var buyEl;
+/* Cupom aplicado na seção do fim da página. Uma vez aplicado, vale pra qualquer
+   botão de compra até a pessoa recarregar. Muda o texto do modal e, no submit,
+   desvia pro link estático com desconto (ver CUPOM_CHECKOUT_URL). */
+var cupomOn = false;
+function precoComDesconto(){
+  var m = String(PRECO_LOTE || "").replace(/\./g, "").match(/(\d+(?:,\d+)?)/);
+  if(!m) return "";
+  var v = parseFloat(m[1].replace(",", "."));
+  if(!isFinite(v)) return "";
+  return "R$ " + (v * (1 - CUPOM_OFF/100)).toFixed(2).replace(".", ",");
+}
+function pintarBuy(){
+  var sub = byId("buy-sub"), send = byId("buy-send");
+  if(!sub) return;
+  if(cupomOn){
+    var pd = precoComDesconto();
+    sub.innerHTML = 'Cupom <strong style="color:var(--accent)">' + CUPOM_CODIGO + '</strong> aplicado · '
+      + CUPOM_OFF + '% OFF' + (pd ? ' · <strong style="color:var(--accent)">' + pd + '</strong>' : '')
+      + '. Preenche que a gente registra e te leva pro pagamento com o desconto.';
+    if(send) send.textContent = "Ir pro pagamento com desconto";
+  }else{
+    sub.textContent = '1º lote · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.';
+    if(send) send.textContent = "Ir pro pagamento";
+  }
+}
 function openBuy(){
   if(!buyEl){
     buyEl = document.createElement("div");
     buyEl.className = "modal";
     buyEl.innerHTML = '<div class="back" data-bclose></div><div class="box"><button class="x" type="button" data-bclose>×</button>'
-      + '<h3>Garantir ingresso</h3><p class="sub">1º lote · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.</p>'
+      + '<h3>Garantir ingresso</h3><p class="sub" id="buy-sub">1º lote · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.</p>'
       + '<form id="buy-form"><label>Seu nome</label><input id="buy-nome" required maxlength="120" autocomplete="name">'
       + '<label>WhatsApp</label><input id="buy-zap" required maxlength="40" inputmode="tel" autocomplete="tel">'
       + '<label>CPF (opcional)</label><input id="buy-cpf" maxlength="20" inputmode="numeric" autocomplete="off">'
@@ -1070,6 +1137,7 @@ function openBuy(){
     buyEl.querySelectorAll("[data-bclose]").forEach(function(x){ x.addEventListener("click", function(){ buyEl.classList.remove("on"); }); });
     buyEl.querySelector("#buy-form").addEventListener("submit", doBuy);
   }
+  pintarBuy();
   buyEl.classList.add("on");
   warmCheckout(); /* re-aquece: comprador leva um tempo preenchendo o formulário */
 }
@@ -1082,9 +1150,10 @@ function doBuy(e){
      pra reconciliacao manual e SEMPRE redireciona pro link estatico — a venda
      nao pode quebrar. Esse caminho NAO cria pedido nem ingresso: o pagamento
      cai direto na InfinitePay e tem que ser conciliado na mao. */
-  var fb = function(){
+  var fb = function(url){
+    var alvo = url || CHECKOUT_URL;
     var done=false;
-    var go=function(){ if(done) return; done=true; window.location.href = CHECKOUT_URL; };
+    var go=function(){ if(done) return; done=true; window.location.href = alvo; };
     setTimeout(go, 1200); /* o lead nunca segura a compra */
     try{
       var lead = { kind:"checkout_fallback", nome: byId("buy-nome").value, whatsapp: byId("buy-zap").value, cpf: byId("buy-cpf").value };
@@ -1092,6 +1161,10 @@ function doBuy(e){
         .then(go, go);
     }catch(e){ go(); }
   };
+  /* Com cupom o preço é o do link estático com desconto — o checkout-create
+     calcularia o preço cheio no servidor, então esse caminho é pulado de propósito.
+     Mesma consequência do fallback: sem pedido/ingresso, conciliar na mão. */
+  if(cupomOn && CUPOM_CHECKOUT_URL){ fb(CUPOM_CHECKOUT_URL); return; }
   fetch(SB_URL+"/functions/v1/checkout-create", {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){ return r.json(); })
     .then(function(d){ if(d && d.checkout_url){ window.location.href = d.checkout_url; } else { throw 0; } })
@@ -1130,6 +1203,33 @@ if(vipLink){
   if(GRUPO_VIP_URL){ vipLink.href = GRUPO_VIP_URL; }
   else{ vipLink.addEventListener("click", function(e){ e.preventDefault(); vipLink.textContent = "🔧 Link do grupo em breve"; }); }
 }
+
+/* ---- CUPOM (última seção da página): valida o código e já abre o modal de compra ---- */
+(function(){
+  var sec = byId("cupom");
+  if(!sec) return;
+  /* Sem código ou sem link com desconto configurado, a seção some — nunca mostra
+     um cupom que não dá pra honrar. */
+  if(!CUPOM_CODIGO || !CUPOM_CHECKOUT_URL){ sec.remove(); return; }
+  var norm = function(s){ return String(s||"").normalize("NFD").replace(/[^A-Za-z0-9]/g,"").toUpperCase(); };
+  var alvo = norm(CUPOM_CODIGO);
+  var inp = byId("cupom-input"), msg = byId("cupom-msg");
+  byId("cupom-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = norm(inp.value);
+    if(!v){ msg.className = "msg on bad"; msg.textContent = "Digita o código do cupom."; inp.focus(); return; }
+    if(v !== alvo){ msg.className = "msg on bad"; msg.textContent = "Cupom inválido ou expirado."; inp.focus(); return; }
+    cupomOn = true;
+    var pd = precoComDesconto();
+    msg.className = "msg on good";
+    msg.textContent = "Cupom " + CUPOM_CODIGO + " aplicado · " + CUPOM_OFF + "% OFF" + (pd ? " · " + pd : "");
+    byId("cupom-title").textContent = "Cupom aplicado 🔥";
+    byId("cupom-sub").textContent = "Desconto liberado. Preenche teus dados e vai pro pagamento já com o valor menor.";
+    inp.value = CUPOM_CODIGO; inp.readOnly = true;
+    byId("cupom-send").textContent = "Comprar com desconto";
+    openBuy();
+  });
+})();
 
 /* ---- CTA do 5KM (abre modal) ---- */
 var mi = byId("modal-insc");

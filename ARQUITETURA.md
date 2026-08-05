@@ -19,6 +19,13 @@ O gatilho de data continua em `index.html` (`LOTE_ABRE`): antes disso o botão a
 ### Fallback de link estático (degrade)
 Se `checkout-create` falhar (backend fora, 502 do provedor, rede), `doBuy` registra o contato em `submit-lead` com `kind="checkout_fallback"` (nome/WhatsApp/CPF, tabela `gcp_fallback_leads`) e **mesmo assim** redireciona pro `CHECKOUT_URL` estático — a venda nunca quebra. Esse caminho **não cria pedido nem ingresso**: o pagamento cai direto na InfinitePay e precisa de **reconciliação manual** (cruzar `gcp_fallback_leads` com o extrato). `obrigado.html` é a página desse caminho.
 
+### Cupom `FIMDAERA` (15% OFF) — front-only
+Última seção da LP (`#cupom`, logo antes do rodapé). O código é normalizado (sem acento/caixa/espaço) e comparado com `CUPOM_CODIGO`. Válido → marca `cupomOn`, muda o texto/preço do modal e chama `openBuy()`.
+
+No submit com cupom, `doBuy` **pula o `checkout-create`** (o backend calcula o preço cheio a partir de `gcp_ticket_lots`) e usa o mesmo caminho do fallback: registra o contato em `submit-lead` (`kind="checkout_fallback"`) e redireciona pro `CUPOM_CHECKOUT_URL` — link estático da InfinitePay já com o valor com desconto. Consequência igual à do fallback: **não cria pedido nem ingresso**, exige reconciliação manual em `gcp_fallback_leads`.
+
+Config em `index.html`: `CUPOM_CODIGO`, `CUPOM_OFF` (só vitrine), `CUPOM_CHECKOUT_URL`. Qualquer um vazio → a seção é removida do DOM. Para desligar o cupom, limpe `CUPOM_CODIGO`.
+
 ## Backend seguro (`supabase/`)
 ### Tabelas (`supabase/migrations/`)
 - `gcp_ticket_lots` — catálogo/lotes = **fonte de verdade do preço** (nunca confia no front).
