@@ -34,28 +34,60 @@ async function paymentCheck(order_nsu: string, transaction_nsu: string, slug: st
   }
 }
 
+// Toda chamada que não vira pagamento fica registrada aqui. Sem isso, um webhook
+// com payload fora do formato esperado sumia com 400 e não deixava rastro nenhum
+// no banco — era impossível saber se a InfinitePay tinha chamado ou não.
+async function logRaw(
+  db: any, motivo: string, payload: unknown,
+  order_nsu?: string, transaction_nsu?: string,
+) {
+  try {
+    await db.from("gcp_payment_events").insert({
+      provider: "infinitepay",
+      event_key: `raw:${motivo}:${crypto.randomUUID()}`,
+      order_nsu: isUuid(order_nsu) ? order_nsu : null,
+      transaction_nsu: transaction_nsu || null,
+      payload: payload ?? null,
+      processing_status: "error",
+      processed_at: new Date().toISOString(),
+    });
+  } catch { /* log nunca pode derrubar o webhook */ }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
+  const db = createClient(SB_URL, SB_SR, { auth: { persistSession: false } });
+
+  // le como texto ANTES de parsear: depois de req.json() o corpo ja foi
+  // consumido e nao daria pra guardar o payload cru que quebrou.
+  const raw = await req.text().catch(() => "");
   let b: any;
-  try { b = await req.json(); } catch { return json({ error: "invalid_json" }, 400); }
+  try {
+    b = JSON.parse(raw);
+  } catch {
+    await logRaw(db, "invalid_json", { _raw: raw.slice(0, 4000) });
+    return json({ error: "invalid_json" }, 400);
+  }
 
   // validação de formato/tipos dos campos obrigatórios
   const order_nsu = str(b?.order_nsu);
   const transaction_nsu = str(b?.transaction_nsu);
   const slug = str(b?.invoice_slug ?? b?.slug);
-  if (!isUuid(order_nsu) || !transaction_nsu || !slug)
+  if (!isUuid(order_nsu) || !transaction_nsu || !slug) {
+    await logRaw(db, "invalid_payload", b, order_nsu, transaction_nsu);
     return json({ error: "invalid_payload" }, 400);
+  }
 
   const receipt_url = str(b?.receipt_url);
   const event_key = `wh:${order_nsu}:${transaction_nsu}`;
 
-  const db = createClient(SB_URL, SB_SR, { auth: { persistSession: false } });
-
   // Confirmação obrigatória na fonte (não confia no corpo do webhook).
   const chk = await paymentCheck(order_nsu, transaction_nsu, slug);
   if (chk === null) {
-    // provedor indisponível -> devolve erro pra InfinitePay reenviar depois (idempotência cobre)
+    // provedor indisponível -> devolve erro pra InfinitePay reenviar depois (idempotência cobre).
+    // Registra pra dar pra ver se o reenvio realmente acontece.
+    await logRaw(db, "verify_unavailable", b, order_nsu, transaction_nsu);
     return json({ error: "verify_unavailable" }, 503);
   }
   if (chk?.success !== true || chk?.paid !== true) {

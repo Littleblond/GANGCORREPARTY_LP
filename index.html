@@ -311,8 +311,9 @@ section[id]{scroll-margin-top:72px}
 .modal h3{font-size:1.8rem;text-transform:uppercase;margin-bottom:6px}
 .modal .sub{font-size:.9rem;margin-bottom:20px}
 .modal label{display:block;font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
-.modal input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:1rem;padding:13px 15px;transition:border-color .3s}
-.modal input:focus{outline:none;border-color:var(--accent)}
+.modal input,.modal select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:1rem;padding:13px 15px;transition:border-color .3s}
+.modal input:focus,.modal select:focus{outline:none;border-color:var(--accent)}
+.modal select:disabled{opacity:.55}
 .modal .btn{width:100%;margin-top:22px}
 .modal .x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;line-height:1;padding:6px}
 .modal .x:hover{color:var(--text)}
@@ -1109,13 +1110,16 @@ function precoComDesconto(){
   return "R$ " + (v * (1 - CUPOM_OFF/100)).toFixed(2).replace(".", ",");
 }
 function pintarBuy(){
-  var sub = byId("buy-sub"), send = byId("buy-send");
+  var sub = byId("buy-sub"), send = byId("buy-send"), qs = byId("buy-qtd");
   if(!sub) return;
+  /* O cupom e um link estatico com preco fixo de 1 ingresso: trava a quantidade
+     em 1 pra ninguem pagar valor que nao corresponde ao que pediu. */
+  if(qs){ qs.disabled = !!cupomOn; if(cupomOn) qs.value = "1"; }
   if(cupomOn){
     var pd = precoComDesconto();
     sub.innerHTML = 'Cupom <strong style="color:var(--accent)">' + CUPOM_CODIGO + '</strong> aplicado · '
       + CUPOM_OFF + '% OFF' + (pd ? ' · <strong style="color:var(--accent)">' + pd + '</strong>' : '')
-      + '. Preenche que a gente registra e te leva pro pagamento com o desconto.';
+      + '. Vale pra 1 ingresso. Preenche que a gente registra e te leva pro pagamento com o desconto.';
     if(send) send.textContent = "Ir pro pagamento com desconto";
   }else{
     sub.textContent = '1º lote · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.';
@@ -1131,6 +1135,10 @@ function openBuy(){
       + '<form id="buy-form"><label>Seu nome</label><input id="buy-nome" required maxlength="120" autocomplete="name">'
       + '<label>WhatsApp</label><input id="buy-zap" required maxlength="40" inputmode="tel" autocomplete="tel">'
       + '<label>CPF (opcional)</label><input id="buy-cpf" maxlength="20" inputmode="numeric" autocomplete="off">'
+      + '<label>Quantos ingressos</label><select id="buy-qtd">'
+      + '<option value="1">1 ingresso</option><option value="2">2 ingressos</option>'
+      + '<option value="3">3 ingressos</option><option value="4">4 ingressos</option>'
+      + '<option value="5">5 ingressos</option><option value="6">6 ingressos</option></select>'
       + '<button class="btn" type="submit" id="buy-send" style="margin-top:14px">Ir pro pagamento</button>'
       + '<div class="err" id="buy-err" style="display:none;margin-top:10px">Não deu. Vamos direto pro pagamento…</div></form></div>';
     document.body.appendChild(buyEl);
@@ -1145,7 +1153,11 @@ function doBuy(e){
   e.preventDefault();
   var send = byId("buy-send"), err = byId("buy-err");
   err.style.display="none"; send.disabled=true; send.textContent="Aguarde…";
-  var body = { quantity:1, customer:{ name: byId("buy-nome").value, phone: byId("buy-zap").value, cpf: byId("buy-cpf").value } };
+  /* Quantidade REAL escolhida. Antes ia 1 fixo: quem queria 2 acabava pagando
+     um valor que nao batia com o pedido, ou abrindo dois checkouts soltos. */
+  var qtd = parseInt((byId("buy-qtd")||{}).value, 10);
+  if(!(qtd >= 1 && qtd <= 6)) qtd = 1;
+  var body = { quantity:qtd, customer:{ name: byId("buy-nome").value, phone: byId("buy-zap").value, cpf: byId("buy-cpf").value } };
   /* Fallback: backend fora do ar. Registra o contato (kind checkout_fallback)
      pra reconciliacao manual e SEMPRE redireciona pro link estatico — a venda
      nao pode quebrar. Esse caminho NAO cria pedido nem ingresso: o pagamento
@@ -1153,10 +1165,23 @@ function doBuy(e){
   var fb = function(url){
     var alvo = url || CHECKOUT_URL;
     var done=false;
-    var go=function(){ if(done) return; done=true; window.location.href = alvo; };
+    /* Link estatico tem preco de UM ingresso. Mandar quem quer 2+ pra la gera
+       pagamento com valor que nao bate com pedido nenhum — exatamente o buraco
+       que deixou compra sem ingresso. Com qtd>1 o lead e registrado e a pessoa
+       fica na pagina pra tentar de novo, em vez de pagar errado. */
+    var multi = qtd > 1;
+    var go=function(){
+      if(done) return; done=true;
+      if(multi){
+        err.textContent = "Não deu pra abrir o pagamento de " + qtd + " ingressos agora. Já anotamos seu contato — tenta de novo em instantes ou chama a gente no WhatsApp.";
+        err.style.display=""; send.disabled=false; send.textContent="Tentar de novo";
+        return;
+      }
+      window.location.href = alvo;
+    };
     setTimeout(go, 1200); /* o lead nunca segura a compra */
     try{
-      var lead = { kind:"checkout_fallback", nome: byId("buy-nome").value, whatsapp: byId("buy-zap").value, cpf: byId("buy-cpf").value };
+      var lead = { kind:"checkout_fallback", nome: byId("buy-nome").value, whatsapp: byId("buy-zap").value, cpf: byId("buy-cpf").value, quantidade: qtd };
       fetch(SB_URL+"/functions/v1/submit-lead", {method:"POST",keepalive:true,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(lead)})
         .then(go, go);
     }catch(e){ go(); }
@@ -1167,7 +1192,19 @@ function doBuy(e){
   if(cupomOn && CUPOM_CHECKOUT_URL){ fb(CUPOM_CHECKOUT_URL); return; }
   fetch(SB_URL+"/functions/v1/checkout-create", {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){ return r.json(); })
-    .then(function(d){ if(d && d.checkout_url){ window.location.href = d.checkout_url; } else { throw 0; } })
+    .then(function(d){
+      if(d && d.checkout_url){ window.location.href = d.checkout_url; return; }
+      /* Estoque/limite: mandar pro link estatico so criaria pagamento sem pedido.
+         Diz o que houve e deixa a pessoa escolher outra quantidade. */
+      if(d && (d.error === "sold_out" || d.error === "over_max_per_order")){
+        err.textContent = d.error === "sold_out"
+          ? "Não temos " + qtd + " ingresso(s) sobrando neste lote. Tenta uma quantidade menor."
+          : "Máximo por compra excedido. Tenta uma quantidade menor.";
+        err.style.display=""; send.disabled=false; send.textContent="Tentar de novo";
+        return;
+      }
+      throw 0;
+    })
     .catch(function(){ fb(); });
 }
 

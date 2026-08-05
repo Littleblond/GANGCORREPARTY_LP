@@ -62,15 +62,19 @@ Deno.serve(async (req) => {
   // checkout_fallback nao usa RPC: grava direto em gcp_fallback_leads (service_role).
   let ident = "";
   let rpc = "", args: Record<string, unknown> = {};
-  let fallback: { nome: string; whatsapp: string; cpf: string | null } | null = null;
+  let fallback: { nome: string; whatsapp: string; cpf: string | null; quantidade: number } | null = null;
   if (kind === "checkout_fallback") {
     // Venda que caiu no link estatico da InfinitePay: sem pedido, sem ingresso.
     // So o contato, pra reconciliar na mao depois. Email/termo nao se aplicam.
     const whatsapp = digits(clean(b?.whatsapp, 40));
     const cpf = clean(b?.cpf, 20).replace(/[^\d]/g, "");
     if (whatsapp.length < 8) return json({ error: "invalid_phone" }, 400, cors);
+    // Quantos ingressos a pessoa queria: sem isso a reconciliacao com o extrato
+    // da InfinitePay nao sabe se o valor pago corresponde a 1 ou a varios.
+    const q = Number(b?.quantidade);
+    const quantidade = Number.isInteger(q) && q >= 1 && q <= 6 ? q : 1;
     ident = whatsapp;
-    fallback = { nome, whatsapp, cpf: cpf || null };
+    fallback = { nome, whatsapp, cpf: cpf || null, quantidade };
   } else if (kind === "inscricao") {
     const whatsapp = digits(clean(b?.whatsapp, 40));
     const email = clean(b?.email, 160).toLowerCase();
