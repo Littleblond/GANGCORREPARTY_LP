@@ -1073,7 +1073,7 @@ var LOTE_ABRE = "2026-07-23T19:00:00-03:00";
    e nunca confia no front). Ao trocar de lote/preço, atualize os DOIS lugares:
    1) price_cents do lote ativo em gcp_ticket_lots;  2) PRECO_LOTE aqui.
    Se divergirem, o comprador vê um valor e paga outro (o do banco). */
-var PRECO_LOTE = "R$ 50";
+var PRECO_LOTE = "R$ 65";
 var DATA_EVENTO   = "2026-08-29T20:00:00-03:00";
 var SB_URL = "https://asppjvxeqpfsonknukla.supabase.co";
 var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
@@ -1224,7 +1224,7 @@ function aplicarEstadoLote(){
     document.querySelectorAll(".js-buy").forEach(function(b){ b.textContent = "🔥 Comprar ingresso"; });
     if(PRECO_LOTE){
       var pe = byId("festa-price");
-      if(pe){ pe.innerHTML = PRECO_LOTE + '<small>1º lote promocional · vendas abertas</small>'; }
+      if(pe){ pe.innerHTML = PRECO_LOTE + '<small>2º lote · vendas abertas</small>'; }
     }
   }
 }
