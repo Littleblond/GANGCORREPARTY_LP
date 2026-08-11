@@ -1054,16 +1054,11 @@ var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var GRUPO_VIP_URL = "https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6";
 /* Link de pagamento da InfinitePay. VAZIO = botão abre o grupo VIP (como agora).
    Quando o lote abrir, cole aqui o link e todos os botões viram compra direta. */
-var CHECKOUT_URL = "https://checkout.infinitepay.io/nathalialouise?lenc=G-sAAOT_Tn0FLsiBZIKWKnRrJv8yQTq1AmuL93me3jxQKwyCtrB5LcsyCfSgB_1BN1aCGJw_xoO2-dWMu3-47oa35jEpAvQyiS1UcBJ6vmraGxosNVTlkdQPq4sfOjtS7f98fwe4TNmy1q3sOsjN5wLaVmagI0EFoFmAOrdQ03BSUr5sJEfB0D_aHQ94aMNUPo-K55gc2lYK-5qEmI6y5TKkNMYMWGs1FWA3.v1.b997a465fc145205";
-/* Cupom de desconto (seção no fim da página). Código é comparado sem acento/caixa.
-   CUPOM_CHECKOUT_URL é um link ESTÁTICO da InfinitePay já com o preço com desconto:
-   quem usa cupom NÃO passa pelo checkout-create (o backend calcula o preço cheio).
-   Ou seja, esse caminho não cria pedido nem ingresso no banco — só registra o lead
-   (kind checkout_fallback, tabela gcp_fallback_leads) pra reconciliação manual,
-   igual ao fallback do link estático. Vazio = cupom desligado (seção some). */
-var CUPOM_CODIGO = "FIMDAERA";
-var CUPOM_OFF = 15; /* % de desconto — só vitrine; o preço real é o do link acima */
-var CUPOM_CHECKOUT_URL = "https://checkout.infinitepay.io/nathalialouise?lenc=G58AYIzUWc2Ni02c6wY2wPZoo6iiBJk-ZlKCfg2J6-TAISsIvgVBIAdpK4MMAt1YaEaxjL0JgjE9G5NGlMKs-D0J3CWSF1iR5pj6OZaQhMbKWiegt8rnNVRyW_EdJVoYG-aax30yADZ89w8uTij6WpxRlKbGDfTaLSGSxbfu_EEjAjIqcg.v1.8d22a006f9f6f70e";
+var CHECKOUT_URL = "";
+/* Cupom de desconto (seção no fim da página). */
+var CUPOM_CODIGO = "";
+var CUPOM_OFF = 0;
+var CUPOM_CHECKOUT_URL = "";
 /* Quando o 1º lote abre. Antes disso o botão abre o grupo VIP; a partir daqui
    (E com CHECKOUT_URL preenchido) todos os botões viram compra direta, sozinho. */
 var LOTE_ABRE = "2026-07-23T19:00:00-03:00";
