@@ -412,3 +412,14 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# --- Funcoes publicas: NAO exigem JWT ---
+# A InfinitePay chama o webhook sem Authorization nenhum, e a LP chama o
+# checkout com a chave publishable (`sb_publishable_...`), que nao e um JWT.
+# Com verify_jwt = true as duas levam 401: o pagamento para de confirmar e a
+# venda para de abrir. Declarado aqui pra deploy futuro nao reintroduzir isso.
+[functions.infinitepay-webhook]
+verify_jwt = false
+
+[functions.checkout-create]
+verify_jwt = false
