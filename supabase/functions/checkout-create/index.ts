@@ -72,6 +72,14 @@ Deno.serve(async (req) => {
 
   const lotId = body?.lot_id ? clean(body.lot_id, 60) : null;
 
+  // Cookies do Meta Pixel + user-agent/IP. Guardados no pedido pra CAPI mandar
+  // o Purchase com dados de casamento no webhook (server-side). Puramente
+  // opcionais: pedido sem eles funciona igual, só atribui pior.
+  const fbp = clean(body?.fbp, 100);
+  const fbc = clean(body?.fbc, 255);
+  const client_ua = clean(req.headers.get("user-agent"), 400);
+  const client_ip = ip === "unknown" ? null : ip;
+
   const db = createClient(SB_URL, SB_SR, { auth: { persistSession: false } });
 
   // preço e disponibilidade: fonte de verdade = banco (price_cents do lote ativo).
@@ -96,6 +104,7 @@ Deno.serve(async (req) => {
     order_nsu, public_token,
     customer_name: name, customer_email: email || null, customer_phone: phone, customer_cpf: cpf || null,
     status: "pending", expected_amount: expected,
+    fbp: fbp || null, fbc: fbc || null, client_ua: client_ua || null, client_ip,
   }).select("id").single();
   if (insErr || !order) return json({ error: "server_error" }, 500, cors);
 

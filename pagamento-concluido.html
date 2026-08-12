@@ -5,6 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Pagamento · Gang Corre Party</title>
+
+<!-- ============ META PIXEL ============
+     MESMO ID do index.html. Vazio = no-op.
+     O Purchase daqui é deduplicado com o da CAPI (webhook) pelo eventID = order_nsu:
+     o Meta recebe os dois e conta UMA venda. Se o navegador tiver bloqueador, só a
+     CAPI chega — que é justamente o ponto de ter os dois. -->
+<script>
+var META_PIXEL_ID = ""; /* <<< COLAR O MESMO ID DO index.html */
+window.gcpTrack = function(){};
+(function(){
+  if(!META_PIXEL_ID) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+  (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+  window.gcpTrack = function(name, params, eventId){
+    try{ fbq('track', name, params || {}, eventId ? { eventID: eventId } : undefined); }
+    catch(e){}
+  };
+})();
+</script>
+<!-- ============ /META PIXEL ============ -->
+
 <style>
   :root{--bg:#0a0c10;--surface:#12151c;--surface-2:#171b24;--line:#242a36;--text:#f4f6fa;--muted:#8b93a3;--accent:#4D8DFF;--ok:#38d39f;--err:#E8622C}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -55,6 +81,24 @@
 
   var tries = 0, MAX = 6;
 
+  /* Trava: o botão "tentar de novo" pode rodar check() outra vez depois de pago.
+     Sem isso a mesma venda viraria dois Purchase no navegador. */
+  var purchaseFired = false;
+  function trackPurchase(d){
+    if(purchaseFired) return;
+    purchaseFired = true;
+    var cents = Number((d && (d.paid_amount || d.amount)) || 0);
+    var qtd = (d && d.tickets && d.tickets.length) || 1;
+    window.gcpTrack("Purchase", {
+      content_name: "Ingresso Gang Corre Party",
+      content_type: "product",
+      content_ids: ["gcp-ingresso"],
+      num_items: qtd,
+      value: cents / 100,
+      currency: "BRL"
+    }, order); /* eventID = order_nsu, mesmo usado pela CAPI no webhook */
+  }
+
   function paid(receiptUrl){
     ic.className = "dot ok"; ic.textContent = "✓";
     ttl.textContent = "Pagamento confirmado";
@@ -83,7 +127,7 @@
         headers: { "apikey": KEY, "Authorization": "Bearer " + KEY }
       });
       var d = await r.json().catch(function(){ return {}; });
-      if(r.ok && d.paid){ paid(d.receipt_url); return; }
+      if(r.ok && d.paid){ paid(d.receipt_url); trackPurchase(d); return; }
       if(r.ok && (d.status === "pending" || d.status === "payment_link_created" || d.status === "processing")){
         if(tries < MAX){ ic.innerHTML = '<div class="spin"></div>'; setTimeout(check, 3000); }
         else { pending(); }

@@ -14,6 +14,53 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://checkout.infinitepay.io">
 <link rel="preconnect" href="https://asppjvxeqpfsonknukla.supabase.co">
+
+<!-- ============ META PIXEL (tráfego pago) ============
+     META_PIXEL_ID vazio = tudo vira no-op. A página funciona igual sem pixel;
+     nenhum evento pode derrubar venda, formulário ou checkout (tudo em try/catch).
+     Ao criar o pixel na BM, colar o ID aqui E em pagamento-concluido.html.
+     A CSP do vercel.json já libera connect.facebook.net / www.facebook.com. -->
+<script>
+var META_PIXEL_ID = ""; /* <<< COLAR O ID DO PIXEL AQUI */
+
+/* Lê _fbp/_fbc pra mandar junto no checkout (casamento server-side via CAPI).
+   Definido FORA do guard: mesmo sem pixel, captura o fbclid de quem veio do anúncio. */
+window.gcpFbCookies = function(){
+  try{
+    var get = function(n){
+      var m = document.cookie.match("(^|;)\\s*" + n + "\\s*=\\s*([^;]+)");
+      return m ? m.pop() : "";
+    };
+    var fbc = get("_fbc");
+    if(!fbc){
+      var cid = new URLSearchParams(location.search).get("fbclid");
+      if(cid) fbc = "fb.1." + Date.now() + "." + cid;
+    }
+    return { fbp: get("_fbp"), fbc: fbc };
+  }catch(e){ return { fbp:"", fbc:"" }; }
+};
+window.gcpTrack = function(){}; /* stub: sobrescrito abaixo se houver pixel */
+
+(function(){
+  if(!META_PIXEL_ID) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+  (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+  /* eventId = chave de deduplicação com a CAPI (mesmo evento, dois caminhos). */
+  window.gcpTrack = function(name, params, eventId){
+    try{ fbq('track', name, params || {}, eventId ? { eventID: eventId } : undefined); }
+    catch(e){ /* pixel nunca derruba a página */ }
+  };
+})();
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+  src="https://www.facebook.com/tr?id=&ev=PageView&noscript=1"></noscript>
+<!-- ============ /META PIXEL ============ -->
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1097,6 +1144,17 @@ var buyEl;
    botão de compra até a pessoa recarregar. Muda o texto do modal e, no submit,
    desvia pro link estático com desconto (ver CUPOM_CHECKOUT_URL). */
 var cupomOn = false;
+/* Preço do lote como número, pro value dos eventos do pixel.
+   Só VITRINE (igual PRECO_LOTE): a fonte de verdade do valor cobrado segue sendo
+   o banco. Se der ruim no parse, devolve 0 e o evento vai sem value — nunca quebra. */
+function precoNumero(){
+  try{
+    var m = String(PRECO_LOTE || "").replace(/\./g, "").match(/(\d+(?:,\d+)?)/);
+    if(!m) return 0;
+    var v = parseFloat(m[1].replace(",", "."));
+    return isFinite(v) ? v : 0;
+  }catch(e){ return 0; }
+}
 function precoComDesconto(){
   var m = String(PRECO_LOTE || "").replace(/\./g, "").match(/(\d+(?:,\d+)?)/);
   if(!m) return "";
@@ -1167,6 +1225,14 @@ function openBuy(){
   pintarBuy();
   buyEl.classList.add("on");
   warmCheckout(); /* re-aquece: comprador leva um tempo preenchendo o formulário */
+  /* Abrir o modal = intenção real de compra. Vira ViewContent no pixel. */
+  window.gcpTrack("ViewContent", {
+    content_name: "Ingresso Gang Corre Party",
+    content_type: "product",
+    content_ids: ["gcp-ingresso"],
+    value: precoNumero(),
+    currency: "BRL"
+  });
 }
 function doBuy(e){
   e.preventDefault();
@@ -1182,6 +1248,23 @@ function doBuy(e){
   extraInputs.forEach(function(el){ if(el.value.trim()) extraNames.push(el.value.trim()); });
   var finalName = mainName + (extraNames.length ? " (+ " + extraNames.join(", ") + ")" : "");
   var body = { quantity:qtd, customer:{ name: finalName, phone: byId("buy-zap").value, cpf: byId("buy-cpf").value } };
+  /* Cookies do pixel viajam junto com o pedido: é o que permite a CAPI atribuir
+     a compra ao anúncio certo depois, no webhook (server-side, imune a bloqueador). */
+  try{
+    var fbk = window.gcpFbCookies();
+    if(fbk.fbp) body.fbp = fbk.fbp;
+    if(fbk.fbc) body.fbc = fbk.fbc;
+  }catch(e){}
+  /* InitiateCheckout: com R$30/dia e pouca compra/semana, este é o evento com
+     volume suficiente pro Meta otimizar. Ver plano de mídia. */
+  window.gcpTrack("InitiateCheckout", {
+    content_name: "Ingresso Gang Corre Party",
+    content_type: "product",
+    content_ids: ["gcp-ingresso"],
+    num_items: qtd,
+    value: precoNumero() * qtd,
+    currency: "BRL"
+  });
   /* Fallback: backend fora do ar. Registra o contato (kind checkout_fallback)
      pra reconciliacao manual e SEMPRE redireciona pro link estatico — a venda
      nao pode quebrar. Esse caminho NAO cria pedido nem ingresso: o pagamento
@@ -1420,7 +1503,18 @@ function sbForm(formId, sendId, errId, modal, kind, bodyFn, sendLabel){
     var body=bodyFn(); body.kind=kind; body.ff = t0 ? (Date.now()-t0) : 9999;
     fetch(SB_URL+"/functions/v1/submit-lead", {method:"POST",headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
       .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-      .then(function(d){ if(!d || !d.ok) throw 0; modal.classList.add("done"); })
+      .then(function(d){
+        if(!d || !d.ok) throw 0;
+        modal.classList.add("done");
+        /* Só dispara com sucesso confirmado pelo backend — nada de contar lead que
+           não gravou. Inscrição do 5KM e patrocínio vão em eventos DIFERENTES pro
+           conjunto que otimiza por Lead não ser poluído por lead B2B. */
+        if(kind === "inscricao"){
+          window.gcpTrack("Lead", { content_name: "Inscricao 5KM gratuita", currency: "BRL", value: 0 });
+        }else if(kind === "sponsor"){
+          window.gcpTrack("SubmitApplication", { content_name: "Interesse patrocinio" });
+        }
+      })
       .catch(function(){ err.style.display="block"; })
       .finally(function(){ send.disabled=false; send.textContent=sendLabel; });
   });
