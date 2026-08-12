@@ -1101,6 +1101,13 @@ var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var GRUPO_VIP_URL = "https://chat.whatsapp.com/IsE73l70O8JGES3aNL9tb6";
 /* Link de pagamento da InfinitePay. VAZIO = botão abre o grupo VIP (como agora).
    Quando o lote abrir, cole aqui o link e todos os botões viram compra direta. */
+/* Chave mestra da venda. true = botoes abrem o modal de compra (a partir de
+   LOTE_ABRE). false = tudo volta pro grupo VIP. Use isto pra abrir/fechar
+   venda — NAO use CHECKOUT_URL pra isso. */
+var VENDAS_ABERTAS = true;
+/* Plano B: so e usado se o checkout-create do servidor falhar. Vazio de
+   proposito desde 10/08 — o link estatico tinha preco do 1o lote (R$50) e
+   gerava pagamento sem pedido no lote de R$65. Deixar vazio. */
 var CHECKOUT_URL = "";
 /* Cupom de desconto (seção no fim da página). */
 var CUPOM_CODIGO = "";
@@ -1279,8 +1286,14 @@ function doBuy(e){
     var multi = qtd > 1;
     var go=function(){
       if(done) return; done=true;
-      if(multi){
-        err.textContent = "Não deu pra abrir o pagamento de " + qtd + " ingressos agora. Já anotamos seu contato — tenta de novo em instantes ou chama a gente no WhatsApp.";
+      /* Sem alvo, `location.href = ""` recarrega a pagina calado: o comprador ve
+         o formulario limpar sozinho e acha que travou. Como CHECKOUT_URL vive
+         vazio hoje, esse era o caminho de TODA falha do backend. Melhor dizer o
+         que houve — o contato ja foi registrado logo abaixo. */
+      if(multi || !alvo){
+        err.textContent = multi
+          ? "Não deu pra abrir o pagamento de " + qtd + " ingressos agora. Já anotamos seu contato — tenta de novo em instantes ou chama a gente no WhatsApp."
+          : "O pagamento não abriu agora. Já anotamos seu contato — tenta de novo em instantes ou chama a gente no WhatsApp.";
         err.style.display=""; send.disabled=false; send.textContent="Tentar de novo";
         return;
       }
@@ -1317,8 +1330,15 @@ function doBuy(e){
 
 /* ---- CTA da festa: antes de quinta 19h abre o grupo VIP; depois vira compra ---- */
 var mv = byId("modal-vip");
-/* Só vira compra se JÁ passou de LOTE_ABRE E existe link. Sem link = fica no grupo (à prova de erro). */
-function loteAberto(){ return !!CHECKOUT_URL && Date.now() >= new Date(LOTE_ABRE).getTime(); }
+/* ATENCAO — nao voltar a amarrar isto em CHECKOUT_URL.
+   Antes era `!!CHECKOUT_URL && data`. Fazia sentido quando a venda era por link
+   estatico. Em 10/08 o link estatico foi removido de proposito (pra todo mundo
+   passar pelo checkout-create no lote de R$65) e, sem querer, isso derrubou
+   loteAberto() pra false: TODOS os botoes de compra passaram a abrir o modal do
+   grupo VIP e o site parou de vender por 2 dias.
+   Hoje o checkout vem do SERVIDOR; CHECKOUT_URL e so plano B. Entao a venda
+   depende da data e de uma chave explicita — nunca da existencia do link. */
+function loteAberto(){ return VENDAS_ABERTAS && Date.now() >= new Date(LOTE_ABRE).getTime(); }
 document.querySelectorAll(".js-buy").forEach(function(b){ b.addEventListener("click", function(){
   if(loteAberto()){ openBuy(); }
   else { mv.classList.add("on"); }
