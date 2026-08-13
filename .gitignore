@@ -1,2 +1,9 @@
 .vercel
 supabase/.temp/
+
+# Ambiente local. O .env.production e' gerado pelo `vercel` e carrega o
+# VERCEL_OIDC_TOKEN — nunca deve ir pro repositorio.
+.env
+.env.*
+!.env.example
+node_modules/

@@ -80,6 +80,16 @@ Deno.serve(async (req) => {
   const client_ua = clean(req.headers.get("user-agent"), 400);
   const client_ip = ip === "unknown" ? null : ip;
 
+  // Origem da visita. O fbc so diz "veio do Facebook/Instagram" — nao separa
+  // anuncio pago de post organico. A UTM separa, e sem depender da atribuicao
+  // do Meta. Puramente opcional, igual fbp/fbc: pedido sem isso funciona igual.
+  const utm_source       = clean(body?.utm_source, 100);
+  const utm_medium       = clean(body?.utm_medium, 100);
+  const utm_campaign     = clean(body?.utm_campaign, 200);
+  const utm_content      = clean(body?.utm_content, 200);
+  const utm_term         = clean(body?.utm_term, 200);
+  const landing_referrer = clean(body?.landing_referrer, 400);
+
   const db = createClient(SB_URL, SB_SR, { auth: { persistSession: false } });
 
   // preço e disponibilidade: fonte de verdade = banco (price_cents do lote ativo).
@@ -105,6 +115,9 @@ Deno.serve(async (req) => {
     customer_name: name, customer_email: email || null, customer_phone: phone, customer_cpf: cpf || null,
     status: "pending", expected_amount: expected,
     fbp: fbp || null, fbc: fbc || null, client_ua: client_ua || null, client_ip,
+    utm_source: utm_source || null, utm_medium: utm_medium || null,
+    utm_campaign: utm_campaign || null, utm_content: utm_content || null,
+    utm_term: utm_term || null, landing_referrer: landing_referrer || null,
   }).select("id").single();
   if (insErr || !order) return json({ error: "server_error" }, 500, cors);
 

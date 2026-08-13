@@ -39,6 +39,43 @@ window.gcpFbCookies = function(){
     return { fbp: get("_fbp"), fbc: fbc };
   }catch(e){ return { fbp:"", fbc:"" }; }
 };
+/* Origem do visitante (UTM + referrer), guardada junto com o pedido.
+   O _fbc so diz "veio do Facebook/Instagram" — nao separa anuncio pago de post
+   organico nem de link da bio. A UTM separa, e nao depende da atribuicao do Meta.
+   Grava na PRIMEIRA pagina da sessao: quem chega pela LP com utm e navega ate o
+   checkout nao perde a origem no caminho. try/catch em tudo — origem e' opcional,
+   nunca pode derrubar a venda. */
+window.gcpUTM = function(){
+  var vazio = { utm_source:"", utm_medium:"", utm_campaign:"", utm_content:"", utm_term:"", landing_referrer:"" };
+  try{
+    var CHAVE = "gcp_origem";
+    var salvo = null;
+    try{ salvo = JSON.parse(sessionStorage.getItem(CHAVE) || "null"); }catch(e){}
+
+    var q = new URLSearchParams(location.search);
+    var atual = {
+      utm_source:   q.get("utm_source")   || "",
+      utm_medium:   q.get("utm_medium")   || "",
+      utm_campaign: q.get("utm_campaign") || "",
+      utm_content:  q.get("utm_content")  || "",
+      utm_term:     q.get("utm_term")     || "",
+      landing_referrer: document.referrer || ""
+    };
+
+    /* URL com utm sempre vence: e' a chegada mais recente e mais confiavel. */
+    if(atual.utm_source || atual.utm_campaign){
+      try{ sessionStorage.setItem(CHAVE, JSON.stringify(atual)); }catch(e){}
+      return atual;
+    }
+    if(salvo) return salvo;
+
+    /* Sem utm nenhuma: guarda so o referrer, que ja separa organico de direto. */
+    try{ sessionStorage.setItem(CHAVE, JSON.stringify(atual)); }catch(e){}
+    return atual;
+  }catch(e){ return vazio; }
+};
+try{ window.gcpUTM(); }catch(e){} /* roda no load pra fixar a origem da sessao */
+
 window.gcpTrack = function(){}; /* stub: sobrescrito abaixo se houver pixel */
 
 (function(){
@@ -1269,6 +1306,12 @@ function doBuy(e){
     var fbk = window.gcpFbCookies();
     if(fbk.fbp) body.fbp = fbk.fbp;
     if(fbk.fbc) body.fbc = fbk.fbc;
+  }catch(e){}
+  /* Origem da visita viaja junto: responde "essa venda veio do anuncio?" sem
+     depender da atribuicao do Meta, que demora horas e nao enxerga tudo. */
+  try{
+    var org = window.gcpUTM();
+    for(var k in org){ if(org[k]) body[k] = org[k]; }
   }catch(e){}
   /* InitiateCheckout: com R$30/dia e pouca compra/semana, este é o evento com
      volume suficiente pro Meta otimizar. Ver plano de mídia. */
