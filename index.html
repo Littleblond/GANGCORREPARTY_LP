@@ -945,7 +945,11 @@ section[id]{scroll-margin-top:72px}
       <details><summary>Posso participar somente do corre?</summary><div class="a">Sim. Dá para viver só o 5KM, de graça, sem comprar ingresso da festa.</div></details>
       <details><summary>Posso participar somente da festa?</summary><div class="a">Sim. Basta o ingresso da festa. Não é necessário correr.</div></details>
       <details><summary>Posso participar dos dois?</summary><div class="a">Sim. Corre de dia e curte a festa à noite. As duas experiências acontecem no mesmo dia.</div></details>
-      <details><summary>Como compro o ingresso da festa?</summary><div class="a">As vendas do <b>1º lote (promocional)</b> abrem <b>quinta-feira, às 19h</b>, direto no grupo VIP, junto com os valores de todos os lotes. Entre no grupo pelo botão <b>"Entrar no grupo VIP"</b> pra receber o link em primeira mão. O ingresso é vendido separadamente do 5KM.</div></details>
+      <!-- Texto de pre-venda ("abrem quinta, 19h, no grupo VIP") ficou aqui depois
+           da virada de 23/07. Este bloco nao tem .pre-lote e nenhum JS reescreve,
+           entao seguia dizendo que a venda nao abriu — na pergunta de maior
+           intencao de compra da pagina. -->
+      <details><summary>Como compro o ingresso da festa?</summary><div class="a">Clica em qualquer botão <b>"Comprar ingresso"</b> da página. Você preenche nome, WhatsApp e a quantidade, e a gente te leva direto pro pagamento. O ingresso é vendido separadamente do 5KM.</div></details>
       <details><summary>Onde e quando acontece?</summary><div class="a">Dia <b>29 de agosto</b> (sábado), no <b>Seu Jorge Boteco</b>, em Umuarama-PR. Largada do 5KM às 20h e início da festa às 21h.</div></details>
       <details><summary>Quantas atrações haverá na festa?</summary><div class="a"><b>Três atrações</b> no palco durante a noite. Os nomes são divulgados nas redes da Gang (@runninggang_br).</div></details>
     </div>
@@ -1182,7 +1186,11 @@ function pintarBuy(){
       + '. Vale pra 1 ingresso. Preenche que a gente registra e te leva pro pagamento com o desconto.';
     if(send) send.textContent = "Ir pro pagamento com desconto";
   }else{
-    sub.textContent = '1º lote · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.';
+    /* Sem numero de lote: a secao do ingresso ja diz qual esta aberto, e aqui
+       ficava cravado "1º lote" mesmo depois da virada pro 2º (R$65) — o comprador
+       lia um lote na pagina e outro na hora de pagar. Preco continua vindo de
+       PRECO_LOTE, que espelha gcp_ticket_lots.price_cents. */
+    sub.textContent = 'Ingresso · ' + (PRECO_LOTE || "") + '. Preenche que a gente registra e te leva pro pagamento.';
     if(send) send.textContent = "Ir pro pagamento";
   }
 }
