@@ -265,21 +265,34 @@ section[id]{scroll-margin-top:72px}
 .stat .l{font-size:.92rem;color:var(--muted);margin-top:10px;line-height:1.4}
 
 /* galerias */
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:34px}
-.tab{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
-  cursor:pointer;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;
-  padding:11px 18px;transition:color .3s,border-color .3s,background .3s}
-.tab:hover{color:var(--text);border-color:var(--accent)}
-.tab.on{color:#0C0E13;background:var(--accent);border-color:var(--accent)}
+.gallery-box{margin-top:34px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:clamp(20px,4vw,32px)}
+.tabs{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 10px;margin:-2px -2px 0;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;-ms-overflow-style:none;
+  mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;color:var(--muted);background:var(--surface-2);border:1px solid var(--line-soft);border-radius:999px;
+  padding:11px 18px;transition:color .25s,border-color .25s,background .25s,transform .25s,box-shadow .25s}
+.tab:hover{color:var(--text);border-color:var(--accent);background:var(--bg-2);transform:translateY(-2px)}
+.tab.on{color:#0C0E13;background:var(--accent);border-color:var(--accent);
+  box-shadow:0 8px 20px rgba(77,141,255,.35);transform:translateY(-1px)}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.panel{display:none;margin-top:26px}
+.tab-n{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:0;color:currentColor;opacity:.55;
+  background:rgba(255,255,255,.12);border-radius:999px;padding:2px 7px}
+.tab.on .tab-n{opacity:.7;background:rgba(12,14,19,.16)}
+.panel{display:none;margin-top:24px}
 .panel.on{display:block}
-.panel .desc{color:var(--muted);max-width:60ch;margin-bottom:22px}
+.panel-title{font-family:var(--display);font-size:1.3rem;text-transform:uppercase;letter-spacing:.01em;margin-bottom:8px}
+.panel .desc{color:var(--muted);max-width:60ch;margin-bottom:20px}
 .panel .desc strong{color:var(--text)}
 .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media (max-width:700px){.gal{gap:8px}}
-.gal .th{position:relative;display:block;width:100%;aspect-ratio:4/3;border:none;padding:0;cursor:pointer;border-radius:10px;overflow:hidden;background:var(--surface)}
+.gal .th{position:relative;display:block;width:100%;aspect-ratio:4/3;border:none;padding:0;cursor:pointer;border-radius:10px;overflow:hidden;background:var(--bg-2);box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .3s,box-shadow .3s}
 .gal .th img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s cubic-bezier(.23,1,.32,1)}
+.gal .th:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.35)}
 .gal .th:hover img{transform:scale(1.05)}
 .gal .th:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .gal .th.more::after{content:attr(data-more);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -474,8 +487,10 @@ section[id]{scroll-margin-top:72px}
       <h2>Os eventos que lotaram antes</h2>
       <p class="lead">Escolhe um evento e vê como foi. Toca na foto pra abrir a galeria.</p>
     </div>
-    <div class="tabs rv" role="tablist" id="tabs"></div>
-    <div id="panels" class="rv"></div>
+    <div class="gallery-box rv">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div id="panels"></div>
+    </div>
   </div>
 </section>
 
@@ -543,13 +558,6 @@ section[id]{scroll-margin-top:72px}
       <div class="lu-sub">Role pra baixo e conhece quem toca no dia 29</div>
     </div>
     <div class="lu-list" id="lu-list"></div>
-    <div class="lu-like rv">
-      <button class="lu-like-btn" id="lu-like-btn" type="button" aria-label="Curtir o line-up">
-        <span class="lu-heart" id="lu-heart">&#10084;</span>
-        <span class="lu-count" id="lu-count">…</span>
-      </button>
-      <span class="lu-like-label">curtindo o line-up</span>
-    </div>
   </div>
 </section>
 <script>
@@ -599,85 +607,8 @@ section[id]{scroll-margin-top:72px}
       + '</div>';
     list.appendChild(art);
   });
-
-  /* ---- botão de like ao vivo (line-up) — chamado após SB_URL/SB_KEY existirem ---- */
-  window.initLuLike=function(SB_URL, SB_KEY){
-    var btn=document.getElementById("lu-like-btn"), cnt=document.getElementById("lu-count");
-    if(!btn||!cnt||!SB_URL||!SB_KEY) return;
-    var current=0, cooldown=false;
-
-    function rpc(fn){
-      return fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",
-        headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},
-        body:JSON.stringify({})}).then(function(r){return r.ok?r.json():0;}).catch(function(){return 0;});
-    }
-    function addLike(){
-      return fetch(SB_URL+"/functions/v1/add-like",{method:"POST",
-        headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},
-        body:"{}"}).then(function(r){return r.ok?r.json():null;})
-        .then(function(d){ return d&&d.total ? d.total : 0; }).catch(function(){return 0;});
-    }
-    function setCount(n){
-      n=parseInt(n,10)||0; if(n===current) return;
-      var up = n>current;
-      current=n;
-      cnt.textContent = n.toLocaleString("pt-BR");
-      if(up){ cnt.classList.remove("bump"); void cnt.offsetWidth; cnt.classList.add("bump"); }
-    }
-    rpc("gcp_get_likes").then(setCount);
-    setInterval(function(){ rpc("gcp_get_likes").then(setCount); }, 8000);
-    btn.addEventListener("click",function(){
-      if(cooldown) return;
-      cooldown=true; btn.setAttribute("aria-busy","true");
-      setCount(current+1);
-      btn.classList.remove("did"); void btn.offsetWidth; btn.classList.add("did");
-      addLike().then(function(n){
-        if(n) setCount(n);
-        setTimeout(function(){ cooldown=false; btn.removeAttribute("aria-busy"); }, 1500);
-      });
-    });
-  };
 })();
 </script>
-
-<!-- 7 + 4. APRESENTAÇÃO / ATMOSFERA -->
-<section id="como-e" style="padding-top:0">
-  <div class="container narrow">
-    <div class="rv">
-      <div class="eyebrow">Como é o dia</div>
-      <h2>Primeiro o corre. Depois a festa.</h2>
-      <p class="lead">De dia, um 5KM com som no meio do pelotão, do jeito que só a Gang faz. À noite, a comemoração de 1 ano no palco do Seu Jorge Boteco. Duas experiências, um dia só, e você escolhe como viver.</p>
-    </div>
-    <div class="two-step rv">
-      <div class="ts">
-        <div class="when">De dia · 20h</div>
-        <h3>O 5KM</h3>
-        <p>Concentração, aquecimento e largada às 20h. Percurso com música acompanhando o pelotão. Gratuito, aberto a qualquer ritmo. Nunca correu 5KM? 75% da Gang fez o primeiro com a gente.</p>
-      </div>
-      <div class="ts">
-        <div class="when">À noite · 21h</div>
-        <h3>A festa</h3>
-        <p>A partir das 21h, a festa de 1 ano da Running Gang no Seu Jorge Boteco, com três atrações no palco. Entrada com ingresso, vendido separadamente do corre.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 11. INSCRIÇÃO E SORTEIOS -->
-<section id="sorteios" style="padding-top:0">
-  <div class="container narrow">
-    <div class="sorteio rv">
-      <div class="eyebrow">Vai correr com a gente?</div>
-      <h2>Vai correr com a Gang?</h2>
-      <p>Você pode participar do 5KM mesmo sem preencher a inscrição.</p>
-      <p>Mas, para concorrer aos sorteios realizados durante a campanha de lançamento, é necessário estar inscrito gratuitamente no corre.</p>
-      <div class="warn">A inscrição no 5KM não inclui o ingresso da festa.</div>
-      <div class="cta-row">
-        <button class="btn js-insc" type="button">🏃 Inscrever-me no 5KM</button>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- 6. ESCOLHA COMO VIVER ESSE DIA -->
 <section id="experiencias">
@@ -689,8 +620,21 @@ section[id]{scroll-margin-top:72px}
     </div>
     <div class="connector rv">O corre termina onde a festa começa</div>
     <div class="duo rv">
+      <div class="card2 paid">
+        <div class="k">Momento 1 · à noite</div>
+        <h3>Festa com ingresso</h3>
+        <div class="price-tag">Ingresso disponível</div>
+        <p>A festa de 1 ano da Running Gang no Seu Jorge Boteco, com três atrações no palco. Você pode ir somente à festa. Não é necessário participar do 5KM.</p>
+        <ul>
+          <li>Festa com ingresso pago</li>
+          <li>Três atrações no palco</li>
+          <li>Participação independente do corre</li>
+          <li class="no">Ingresso vendido separadamente do 5KM</li>
+        </ul>
+        <button class="btn js-buy" type="button">Entrar no grupo VIP</button>
+      </div>
       <div class="card2">
-        <div class="k">Momento 1 · de dia</div>
+        <div class="k">Momento 2 · de dia</div>
         <h3>5KM gratuito</h3>
         <div class="price-tag">Gratuito</div>
         <p>Um corre no estilo da Gang: todo mundo junto, música no pelotão e uma experiência feita pra quem quer viver os 5KM de um jeito diferente. Você pode participar mesmo sem realizar a inscrição. Só os inscritos concorrem aos sorteios da campanha.</p>
@@ -701,19 +645,6 @@ section[id]{scroll-margin-top:72px}
           <li class="no">A inscrição não inclui acesso à festa</li>
         </ul>
         <button class="btn ghost js-insc" type="button">Inscrever-me no 5KM</button>
-      </div>
-      <div class="card2 paid">
-        <div class="k">Momento 2 · à noite</div>
-        <h3>Festa com ingresso</h3>
-        <div class="price-tag">Ingresso disponível</div>
-        <p>Depois do corre, o Seu Jorge Boteco recebe a comemoração de 1 ano da Running Gang, com três atrações no palco. Você pode ir somente à festa. Não é necessário participar do 5KM.</p>
-        <ul>
-          <li>Festa com ingresso pago</li>
-          <li>Três atrações no palco</li>
-          <li>Participação independente do corre</li>
-          <li class="no">Ingresso vendido separadamente do 5KM</li>
-        </ul>
-        <button class="btn js-buy" type="button">Entrar no grupo VIP</button>
       </div>
     </div>
   </div>
@@ -753,6 +684,18 @@ section[id]{scroll-margin-top:72px}
         <button class="btn big js-buy" type="button">🔥 Entrar no grupo VIP</button>
       </div>
       <p class="aviso"><b>O ingresso da festa é vendido separadamente do 5KM.</b> A inscrição no corre não dá acesso à festa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 11. INSCRIÇÃO NO 5KM -->
+<section id="sorteios" style="padding-top:0">
+  <div class="container narrow">
+    <div class="sorteio rv" style="text-align:center">
+      <p class="lead" style="margin:0 auto 20px">Quer só correr? A inscrição no 5KM é gratuita e opcional.</p>
+      <div class="cta-row" style="justify-content:center">
+        <button class="btn ghost js-insc" type="button">🏃 Inscrever-me no 5KM</button>
+      </div>
     </div>
   </div>
 </section>
@@ -997,7 +940,6 @@ var SB_KEY = "sb_publishable_K8nSpB8AP57ZlTIgGI1ANQ_pmNk4o3p";
 
 /* liga o botão de like do line-up (precisa do SB_URL/SB_KEY acima).
    try/catch: se o like falhar, NÃO pode derrubar botões/texto/formulários. */
-try{ if(window.initLuLike) window.initLuLike(SB_URL, SB_KEY); }catch(e){ console.warn("like:", e); }
 
 var byId = function(id){ return document.getElementById(id); };
 
@@ -1328,13 +1270,16 @@ var EVENTOS = [
   {slug:"treinos-corvo", nome:"Treinos ft. Corvo", n:12, desc:"Os treinos de toda semana: o coração da comunidade batendo. <strong>É aqui que a Gang vira família.</strong>"}
 ];
 var tabsEl = byId("tabs"), panelsEl = byId("panels");
+var escTab=function(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");};
 EVENTOS.forEach(function(ev, i){
   var b = document.createElement("button");
-  b.className = "tab" + (i===0?" on":""); b.type="button"; b.setAttribute("role","tab"); b.textContent = ev.nome;
+  b.className = "tab" + (i===0?" on":""); b.type="button"; b.setAttribute("role","tab");
+  b.innerHTML = escTab(ev.nome) + '<span class="tab-n">'+ev.n+'</span>';
   b.addEventListener("click", function(){
     tabsEl.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("on"); });
     panelsEl.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("on"); });
     b.classList.add("on"); byId("p-"+ev.slug).classList.add("on");
+    b.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});
   });
   tabsEl.appendChild(b);
   var p = document.createElement("div"); p.className = "panel"+(i===0?" on":""); p.id = "p-"+ev.slug;
@@ -1344,7 +1289,7 @@ EVENTOS.forEach(function(ev, i){
     var more=(k===MOSTRA && ev.n>MOSTRA)?' more" data-more="+'+(ev.n-MOSTRA+1)+' fotos':'';
     thumbs+='<button class="th'+more+'" type="button" data-ev="'+i+'" data-k="'+(k-1)+'" aria-label="Abrir foto '+k+' de '+ev.nome+'"><img src="assets/eventos/'+ev.slug+'/'+nn+'.jpg" alt="'+ev.nome+', foto '+k+'" loading="lazy" decoding="async"></button>';
   }
-  p.innerHTML='<p class="desc">'+ev.desc+'</p><div class="gal">'+thumbs+'</div>';
+  p.innerHTML='<h3 class="panel-title">'+escTab(ev.nome)+'</h3><p class="desc">'+ev.desc+'</p><div class="gal">'+thumbs+'</div>';
   panelsEl.appendChild(p);
 });
 
