@@ -44,12 +44,11 @@
         if(d.error){ fail("Ingresso não encontrado."); return; }
         var used = d.ticket_status==="used";
         box.innerHTML =
-          '<div class="badge'+(used?' used':'')+'">'+(used?"✓ já utilizado":"✓ ingresso válido")+'</div>'
+          '<div class="badge'+(used?' used':'')+'">'+(used?"✓ já utilizado":"✓ ingresso confirmado")+'</div>'
           + '<h1>Gang Corre Party</h1>'
           + (d.name?'<div class="name">'+d.name+'</div>':'')
           + '<p class="sub">1 ano da Running Gang · 29.08 · Seu Jorge Boteco</p>'
-          + '<div class="qr">'+(d.svg||"")+'</div>'
-          + '<div class="info"><b>Como usar:</b> mostre este QR na portaria no dia do evento. Ele vale para <b>1 entrada</b> — não compartilhe.</div>'
+          + '<div class="info"><b>Como entrar:</b> seu nome já está confirmado na lista. No dia do evento, basta apresentar um documento oficial com foto (RG, CNH ou versão digital) na portaria.</div>'
           + '<a class="btn" href="'+GRUPO+'" target="_blank" rel="noopener">🔥 Entrar no grupo VIP</a>'
           + '<div class="foot">Guarde este link. Dúvidas? Fale com a Running Gang.</div>';
       })
